@@ -1,5 +1,7 @@
 Project on File Sharing:-
 
+[![Join the chat at https://gitter.im/File_shared/Lobby#](https://badges.gitter.im/file_sharing/file_sharing.svg)](https://gitter.im/File_shared/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 It consist of
 1. Authorized access to clients
 2. Sorted files for files in directory
