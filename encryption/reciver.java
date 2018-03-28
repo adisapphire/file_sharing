@@ -39,7 +39,7 @@ class Crypto {
      }
 	
      public static void main(String[] args) {
-	String key = "Computer Network Project";
+	String key = "123456789";
 	File encryptedFile = new File("text.encrypted");
 	File decryptedFile = new File("decrypted-text.txt");
 		
