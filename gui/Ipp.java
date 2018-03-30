@@ -6,7 +6,6 @@
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-
 import javax.swing.JOptionPane;
 class Ipp extends javax.swing.JFrame {
 
@@ -151,14 +150,9 @@ class Ipp extends javax.swing.JFrame {
     // End of variables declaration                   
 }
 
-// package gui;
 
 
 
-/**
- *
- * @author avsingh
- */
 class pairing extends javax.swing.JFrame {
 
     /**
@@ -303,6 +297,8 @@ class pairing extends javax.swing.JFrame {
 }
 
 
+
+
 class History extends javax.swing.JFrame {
 
     /**
@@ -442,10 +438,8 @@ class History extends javax.swing.JFrame {
 
 
 
-/**
- *
- * @author avsingh
- */
+
+
  class User extends javax.swing.JFrame {
 
     /**
