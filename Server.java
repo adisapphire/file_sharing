@@ -1,86 +1,52 @@
-import java.net.*;
-import java.util.Scanner;
-import java.io.*;
- 
-public class Server
-{
-    //initialize socket and input stream
-    private Socket          socket   = null;
-    private ServerSocket    server   = null;
-    private DataInputStream in       =  null;
- 
-    // constructor with port
-    public void Connection(int port)
-    {
-        // starts server and waits for a connection
-        try
-        {
-            server = new ServerSocket(port);
-            System.out.println("Server started");
- 
-            System.out.println("Waiting for a client ...");
- 
-            socket = server.accept();
-            System.out.println("Client accepted");
- 
-            // takes input from the client socket
-      /*      in = new DataInputStream(
-                new BufferedInputStream(socket.getInputStream()));
- 
-            String line = "";
- 
-            // reads message from client until "Over" is sent
-            while (!line.equals("Over"))
-            {
-                try
-                {
-                    line = in.readUTF();
-                    System.out.println(line);
- 
-                }
-                catch(IOException i)
-                {
-                    System.out.println(i);
-                }
-            }
-            System.out.println("Closing connection");
- 
-            // close connection
-            socket.close();
-            in.close();*/
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
-    }
- 
-    public void filetransfer() {
-    	 File myFile = new File("s.pdf");
-    	
+package socketprogramming;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class Server {
+
+  public final static int SOCKET_PORT = 13267;  // you may change this
+  public final static String FILE_TO_SEND = "a.pdf";  // you may change this
+
+  public static void main (String [] args ) throws IOException {
+    FileInputStream fis = null;
+    BufferedInputStream bis = null;
+    OutputStream os = null;
+    ServerSocket servsock = null;
+    Socket sock = null;
+    try {
+      servsock = new ServerSocket(SOCKET_PORT);
+      while (true) {
+        System.out.println("Waiting...");
         try {
-        	byte[] mybytearray = new byte[(int) myFile.length()];
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
-			bis.read(mybytearray, 0, mybytearray.length);
-			  OutputStream os = socket.getOutputStream();
-		        os.write(mybytearray, 0, mybytearray.length);
-		        os.flush();
-		        socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-      
+          sock = servsock.accept();
+          System.out.println("Accepted connection : " + sock);
+          // send file
+          File myFile = new File (FILE_TO_SEND);
+          byte [] mybytearray  = new byte [(int)myFile.length()];
+          fis = new FileInputStream(myFile);
+          bis = new BufferedInputStream(fis);
+          bis.read(mybytearray,0,mybytearray.length);
+          os = sock.getOutputStream();
+          System.out.println("Sending " + FILE_TO_SEND + "(" + mybytearray.length + " bytes)");
+          os.write(mybytearray,0,mybytearray.length);
+          os.flush();
+          System.out.println("Done.");
+        }
+        finally {
+          if (bis != null) bis.close();
+          if (os != null) os.close();
+          if (sock!=null) sock.close();
+        }
+      }
     }
-    
-    public static void main(String args[])
-    {
-    	Scanner scan = new Scanner(System.in);
-        Server server = new Server();
-        System.out.println("Enter port no.::");
-        int port = scan.nextInt();
-        server.Connection(port);
-        
-        
+    finally {
+      if (servsock != null) servsock.close();
     }
+  }
 }

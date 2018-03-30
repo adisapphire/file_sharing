@@ -1,106 +1,56 @@
-import java.net.*;
-import java.util.Scanner;
-import java.io.*;
- 
-public class Client
-{
-    // initialize socket and input output streams
-    private Socket socket            = null;
-    private DataInputStream  input   = null;
-    private DataOutputStream out     = null;
- 
-    // constructor to put ip address and port
-    @SuppressWarnings("deprecation")
-	public void  Connection(String address, int port)
-    {
-        // establish a connection
-        try
-        {
-            socket = new Socket(address, port);
-            System.out.println("Connected");
- 
-            // takes input from terminal
-         //   input  = new DataInputStream(System.in);
- 
-            // sends output to the socket
-         //   out    = new DataOutputStream(socket.getOutputStream());
-        }
-        catch(UnknownHostException u)
-        {
-            System.out.println(u);
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
+package socketprogramming;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
+
+public class Client {
+
+  public final static int SOCKET_PORT = 13267;      // you may change this
+  public final static String SERVER = "127.0.0.1";  // localhost
+  public final static String
+       FILE_TO_RECEIVED = "ab.pdf";  // you may change this, I give a
+                                                            // different name because i don't want to
+                                                            // overwrite the one used by server...
+
+  public final static int FILE_SIZE = 6022386; // file size temporary hard coded
+                                               // should bigger than the file to be downloaded
+
+  public static void main (String [] args ) throws IOException {
+    int bytesRead;
+    int current = 0;
+    FileOutputStream fos = null;
+    BufferedOutputStream bos = null;
+    Socket sock = null;
+    try {
+      sock = new Socket(SERVER, SOCKET_PORT);
+      System.out.println("Connecting...");
+
+      // receive file
+      byte [] mybytearray  = new byte [FILE_SIZE];
+      InputStream is = sock.getInputStream();
+      fos = new FileOutputStream(FILE_TO_RECEIVED);
+      bos = new BufferedOutputStream(fos);
+      bytesRead = is.read(mybytearray,0,mybytearray.length);
+      current = bytesRead;
+
+      do {
+         bytesRead =
+            is.read(mybytearray, current, (mybytearray.length-current));
+         if(bytesRead >= 0) current += bytesRead;
+      } while(bytesRead > -1);
+
+      bos.write(mybytearray, 0 , current);
+      bos.flush();
+      System.out.println("File " + FILE_TO_RECEIVED
+          + " downloaded (" + current + " bytes read)");
     }
-    
-    public void filetransfer() throws FileNotFoundException {
-    	byte[] mybytearray = new byte[1024];
-    	try {
-        InputStream is = socket.getInputStream();
-        FileOutputStream fos = new FileOutputStream("s.pdf");
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        int bytesRead = is.read(mybytearray, 0, mybytearray.length);
-        bos.write(mybytearray, 0, bytesRead);
-        bos.close();
-        socket.close();
-    	}
-    	catch(IOException i) {
-    		
-    	}
-    	
+    finally {
+      if (fos != null) fos.close();
+      if (bos != null) bos.close();
+      if (sock != null) sock.close();
     }
-    
-    public void chatcode() {
-    	
-    	
-    }
-        /*// string to read message from input
-        String line = "";
- 
-        // keep reading until "Over" is input
-        while (!line.equals("Over"))
-        {
-            try
-            {
-                line = input.readLine();
-                out.writeUTF(line);
-            }
-            catch(IOException i)
-            {
-                System.out.println(i);
-            }
-        }
- 
-        // close the connection
-        try
-        {
-            input.close();
-            out.close();
-            socket.close();
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
-    }*/
- 
-    public static void main(String args[])
-    {
-    	Scanner scan = new Scanner(System.in);
-    		
-    	System.out.println("Enter Ip address::");
-    		String ip = scan.nextLine();
-    		System.out.println("Enter port no.::");
-    		int port = scan.nextInt();
-        Client client = new Client();
-        client.Connection(ip,port);
-        try {
-			client.filetransfer();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
+  }
+
 }
