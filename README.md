@@ -12,3 +12,15 @@ It consist of
 7. Encryption of file data - [:white_check_mark:]
 8. Multiple sharing of file - [:white_check_mark:]
 9. Sum up all and build it as one - [: :]
+
+### Solar System Exploration, 1950s – 1960s
+
+- [ ] Mercury
+- [x] Venus
+- [x] Earth (Orbit/Moon)
+- [x] Mars
+- [ ] Jupiter
+- [ ] Saturn
+- [ ] Uranus
+- [ ] Neptune
+- [ ] Comet Haley
