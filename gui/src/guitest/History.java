@@ -1,5 +1,5 @@
+package guitest;
 
-package gui;
 
 /**
  *
