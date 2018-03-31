@@ -131,7 +131,7 @@ class ClientWorker implements Runnable {
                     byte[] recv_data = ReadStream();
                     switch (Integer.parseInt(new String(cmd_buff))) {
                         case 124:
-                            rw = new RandomAccessFile("/home/rahul/Downloads/" + new String(recv_data), "rw");
+                            rw = new RandomAccessFile("/home/rockstar/Downloads/" + new String(recv_data), "rw");
                             dout.write(CreateDataPacket("125".getBytes("UTF8"), String.valueOf(current_file_pointer).getBytes("UTF8")));
                             dout.flush();
                             break;
@@ -280,6 +280,7 @@ public class Server {
 			Server server = new Server();
 			server.setupconnection(8000);
 			//server.serverchat();
+			server.serverfiletransfer();
 	}
 
 }

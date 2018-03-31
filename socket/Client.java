@@ -97,7 +97,7 @@ public class Client {
 		}catch(IOException e) {}
 	}
 	
-	public void serverfiletransfer() {
+	public void clientfiletransfer() {
 		 try {
 	            
 	            
@@ -198,6 +198,7 @@ public class Client {
 		Client client = new Client();
 		client.setupconnection("127.0.0.1", 8000);
 		//client.clientchat();
+		client.clientfiletransfer();
 
 	}
 
