@@ -87,61 +87,58 @@ public class hi extends javax.swing.JFrame {
   
         
        search_txt_fil.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
                 
                 get_txt =  search_txt_fil.getText();
                 search_txt_fil.setText(get_txt);
                 
             }
         });
-//        
-        
        Search_txt.setText("search");
         Search_txt.addActionListener(new java.awt.event.ActionListener() {
-            
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                 get_txt =  search_txt_fil.getText();
-                 System.out.println(get_txt+"-----?");
-//                Search_txtActionPerformed(evt);
-                 Object obj [][]= new Object [1000][5];
-//                ArrayList<String> array_list = new ArrayList<String>();
-                try{
-                  FileInputStream fstream = new FileInputStream("C:\\Users\\avsingh\\Documents\\text.txt");
-                  DataInputStream in = new DataInputStream(fstream);
-                  BufferedReader br = new BufferedReader(new InputStreamReader(in));
-                  String strLine;
-                  // Record[] record = new Record[5];
-//                  ArrayList<Record> record = new ArrayList<Record>();
-                  int i=0;
+          public void actionPerformed(java.awt.event.ActionEvent evt) {
+             get_txt =  search_txt_fil.getText();
+             System.out.println(get_txt+"-----?");
+  //                Search_txtActionPerformed(evt);
+             Object obj [][]= new Object [1000][5];
+  //                ArrayList<String> array_list = new ArrayList<String>();
+            try{
+              FileInputStream fstream = new FileInputStream("C:\\Users\\avsingh\\Documents\\text.txt");
+              DataInputStream in = new DataInputStream(fstream);
+              BufferedReader br = new BufferedReader(new InputStreamReader(in));
+              String strLine;
+              // Record[] record = new Record[5];
+  //                  ArrayList<Record> record = new ArrayList<Record>();
+              int i=0;
 
-                        while ((strLine = br.readLine()) != null){
-                              
-                            String[] tokens = strLine.split("  ");
-                              
-                            if(tokens[0].contains(get_txt)||tokens[1].contains(get_txt)||tokens[2].contains(get_txt)||tokens[3].contains(get_txt)){  
-                                obj[i][0] = tokens[0];
-                                String g [] = tokens[1].split(" ");
-                                obj[i][1] = g[0];
-                                obj[i][2] = g[1];
-                                obj[i][3] = tokens[2];
-                                obj[i][4] = tokens[3];
-                               i++;
-                           } 
-                        }
-                    in.close();
-                }
-                catch (Exception e)
-                {
-                  System.err.println("Error: " + e.getMessage());
-                } 
-
-                History_table.setModel(new javax.swing.table.DefaultTableModel(
-                   obj,
-                    new String [] {
-                        "File", "Date", "Time", "action","User"
+                    while ((strLine = br.readLine()) != null){
+                          
+                        String[] tokens = strLine.split("  ");
+                          
+                        if(tokens[0].contains(get_txt)||tokens[1].contains(get_txt)||tokens[2].contains(get_txt)||tokens[3].contains(get_txt)){  
+                            obj[i][0] = tokens[0];
+                            String g [] = tokens[1].split(" ");
+                            obj[i][1] = g[0];
+                            obj[i][2] = g[1];
+                            obj[i][3] = tokens[2];
+                            obj[i][4] = tokens[3];
+                           i++;
+                       } 
                     }
-                ));
+                in.close();
             }
+            catch (Exception e)
+            {
+              System.err.println("Error: " + e.getMessage());
+            } 
+
+            History_table.setModel(new javax.swing.table.DefaultTableModel(
+               obj,
+                new String [] {
+                    "File", "Date", "Time", "action","User"
+                }
+            ));
+          }
         });
 
 
@@ -186,7 +183,6 @@ public class hi extends javax.swing.JFrame {
         
         Filter.setText("Filter");
         Filter.addActionListener(new java.awt.event.ActionListener() {
-         
 //            private Object javax;
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 
@@ -246,19 +242,19 @@ public class hi extends javax.swing.JFrame {
                         new String [] {
                            "File", "Date", "Time","Action","from"
                         }
-                    ));
+                    )); 
                 }
-                
-                
-                
-                
             }
         });
          
-    
-        Filter.setText("Filter");
+
 
         Cancel_button.setText("Cancel");
+        Cancel_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Cancel_buttonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -302,18 +298,18 @@ public class hi extends javax.swing.JFrame {
 
     private void search_txt_filActionPerformed(java.awt.event.ActionEvent evt) {                                               
         // TODO add your handling code here:
-        System.out.println(search_txt_fil.getText());
-    }                                              
+    }   
+                                       
+    private void Cancel_buttonActionPerformed(java.awt.event.ActionEvent evt) {                                              
+        // TODO add your handling code here:
+        this.dispose();
+    }       
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
