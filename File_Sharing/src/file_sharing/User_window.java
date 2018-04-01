@@ -280,6 +280,8 @@ public void clientchat() {
 
     private void historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historyActionPerformed
         // TODO add your handling code here:
+        hi h = new hi();
+        h.setVisible(true);
     }//GEN-LAST:event_historyActionPerformed
 
     private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed

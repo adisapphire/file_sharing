@@ -1,3 +1,5 @@
+package file_sharing;
+
 
 /**
  *
@@ -103,7 +105,7 @@ public class hi extends javax.swing.JFrame {
              Object obj [][]= new Object [1000][5];
   //                ArrayList<String> array_list = new ArrayList<String>();
             try{
-              FileInputStream fstream = new FileInputStream("C:\\Users\\avsingh\\Documents\\text.txt");
+              FileInputStream fstream = new FileInputStream("text.txt");
               DataInputStream in = new DataInputStream(fstream);
               BufferedReader br = new BufferedReader(new InputStreamReader(in));
               String strLine;
@@ -148,7 +150,7 @@ public class hi extends javax.swing.JFrame {
                 Object obj [][]= new Object [1000][5];
                 try
                 {
-                  FileInputStream fstream = new FileInputStream("C:\\Users\\avsingh\\Documents\\text.txt");
+                  FileInputStream fstream = new FileInputStream("text.txt");
                   DataInputStream in = new DataInputStream(fstream);
                   BufferedReader br = new BufferedReader(new InputStreamReader(in));
                   String strLine;
