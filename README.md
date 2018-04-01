@@ -4,8 +4,7 @@ Project on File Sharing:-
 
 It consist of
 - [x] 1. Authorized access to clients
-- [x] 2. Sorted files for files in directory
-- [x] 3. History (date, file shared , user detail)
+- [x] 2. Sorted files for files in directory<br/>:thumbsup: History (date, file shared , user detail)
 - [x] 4. Video Streaming
 - [x] 5. Acception / rejection of connection
 - [x] 6. GUI
