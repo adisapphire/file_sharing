@@ -28,7 +28,10 @@ import java.util.Date;
 import java.util.Scanner;
 import javax.swing.JTextField;
 
-
+/**
+ *
+ * @author DakshGondaliya
+ */
 class Record
 {
    String filename;
@@ -63,6 +66,7 @@ public class hi extends javax.swing.JFrame {
      */
     public hi() {
         initComponents();
+        this.search_txt_fil.setText("");
     }
 
     /**
@@ -300,6 +304,7 @@ public class hi extends javax.swing.JFrame {
 
     private void search_txt_filActionPerformed(java.awt.event.ActionEvent evt) {                                               
         // TODO add your handling code here:
+        
     }   
                                        
     private void Cancel_buttonActionPerformed(java.awt.event.ActionEvent evt) {                                              
