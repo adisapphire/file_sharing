@@ -1,11 +1,10 @@
 package file_sharing;
 
+
 /**
  *
- *@author avsingh
-*
-* @author DakshGondaliya
-*/
+ * @author avsingh
+ */
 
 
 import java.awt.TextField;
@@ -29,6 +28,10 @@ import java.util.Date;
 import java.util.Scanner;
 import javax.swing.JTextField;
 
+/**
+ *
+ * @author DakshGondaliya
+ */
 class Record
 {
    String filename;
@@ -55,15 +58,13 @@ class Record
   
 }
 
-public class hi extends javax.swing.JFrame
-{
+public class hi extends javax.swing.JFrame {
  ArrayList<Record> record = new ArrayList<Record>();
  String get_txt="";
     /**
      * Creates new form hi
      */
-    public hi()
-    {
+    public hi() {
         initComponents();
         this.search_txt_fil.setText("");
     }
@@ -75,8 +76,7 @@ public class hi extends javax.swing.JFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-    private void initComponents()
-    {
+    private void initComponents() {
 
         textArea1 = new java.awt.TextArea();
         search_txt_fil = new java.awt.TextField();
@@ -92,10 +92,8 @@ public class hi extends javax.swing.JFrame
         search_txt_fil.setText("textField1");
   
         
-       search_txt_fil.addActionListener(new java.awt.event.ActionListener()
-       {
-        public void actionPerformed(java.awt.event.ActionEvent evt)
-        {
+       search_txt_fil.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
                 
                 get_txt =  search_txt_fil.getText();
                 search_txt_fil.setText(get_txt);
@@ -103,17 +101,14 @@ public class hi extends javax.swing.JFrame
             }
         });
        Search_txt.setText("search");
-        Search_txt.addActionListener(new java.awt.event.ActionListener() 
-        {
-          public void actionPerformed(java.awt.event.ActionEvent evt)
-          {
+        Search_txt.addActionListener(new java.awt.event.ActionListener() {
+          public void actionPerformed(java.awt.event.ActionEvent evt) {
              get_txt =  search_txt_fil.getText();
              System.out.println(get_txt+"-----?");
   //                Search_txtActionPerformed(evt);
              Object obj [][]= new Object [1000][5];
   //                ArrayList<String> array_list = new ArrayList<String>();
-            try
-            {
+            try{
               FileInputStream fstream = new FileInputStream("text.txt");
               DataInputStream in = new DataInputStream(fstream);
               BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -122,8 +117,7 @@ public class hi extends javax.swing.JFrame
   //                  ArrayList<Record> record = new ArrayList<Record>();
               int i=0;
 
-                    while ((strLine = br.readLine()) != null)
-                    {
+                    while ((strLine = br.readLine()) != null){
                           
                         String[] tokens = strLine.split("  ");
                           
@@ -146,8 +140,7 @@ public class hi extends javax.swing.JFrame
 
             History_table.setModel(new javax.swing.table.DefaultTableModel(
                obj,
-                new String [] 
-                		{
+                new String [] {
                     "File", "Date", "Time", "action","User"
                 }
             ));
@@ -188,23 +181,19 @@ public class hi extends javax.swing.JFrame
 
         History_table.setModel(new javax.swing.table.DefaultTableModel(
            obj,
-            new String [] 
-            {
+            new String [] {
                 "File", "Date", "Time", "action","User"
             }
         ));
         jScrollPane1.setViewportView(History_table);
         
         Filter.setText("Filter");
-        Filter.addActionListener(new java.awt.event.ActionListener()
-        {
+        Filter.addActionListener(new java.awt.event.ActionListener() {
 //            private Object javax;
-            public void actionPerformed(java.awt.event.ActionEvent evt) 
-            {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 
 //                FilterActionPerformed(evt);
-                if(Filter_items.getItemAt(Filter_items.getSelectedIndex()).endsWith("name"))
-                {
+                if(Filter_items.getItemAt(Filter_items.getSelectedIndex()).endsWith("name")){
                     
                     Collections.sort(record, new NameComparator());
                     Object obj1 [][] = new Object[record.size()][5];
@@ -219,15 +208,13 @@ public class hi extends javax.swing.JFrame
                     
                     History_table.setModel(new javax.swing.table.DefaultTableModel(
                         obj1,
-                        new String [] 
-                        {
+                        new String [] {
                             "File", "Date", "Time","Action","from"
                         }
                     ));
                 }
 //                    System.out.println("Fdsfs")
-                else if(Filter_items.getItemAt(Filter_items.getSelectedIndex()).endsWith("Date"))
-                {
+                else if(Filter_items.getItemAt(Filter_items.getSelectedIndex()).endsWith("Date")){
                     Collections.sort(record,new DateModifiedComparator());
                      Object obj1 [][] = new Object[record.size()][5];
                     for(int i=0;i<record.size();i++){
@@ -240,14 +227,12 @@ public class hi extends javax.swing.JFrame
                     }
                     History_table.setModel(new javax.swing.table.DefaultTableModel(
                         obj1,
-                        new String [] 
-                        {
+                        new String [] {
                             "File", "Date", "Time","Action","from"
                         }
                     ));
                 }
-                else if(Filter_items.getItemAt(Filter_items.getSelectedIndex()).endsWith("User"))
-                {
+                else if(Filter_items.getItemAt(Filter_items.getSelectedIndex()).endsWith("User")){
                     Collections.sort(record,new userNameComparator()); 
                      Object obj1 [][] = new Object[record.size()][5];
                     for(int i=0;i<record.size();i++){
@@ -260,8 +245,7 @@ public class hi extends javax.swing.JFrame
                     }
                     History_table.setModel(new javax.swing.table.DefaultTableModel(
                         obj1,
-                        new String [] 
-                        {
+                        new String [] {
                            "File", "Date", "Time","Action","from"
                         }
                     )); 
@@ -272,10 +256,8 @@ public class hi extends javax.swing.JFrame
 
 
         Cancel_button.setText("Cancel");
-        Cancel_button.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt) 
-            {
+        Cancel_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Cancel_buttonActionPerformed(evt);
             }
         });
@@ -320,14 +302,12 @@ public class hi extends javax.swing.JFrame
         pack();
     }// </editor-fold>                        
 
-    private void search_txt_filActionPerformed(java.awt.event.ActionEvent evt)
-    {                                               
+    private void search_txt_filActionPerformed(java.awt.event.ActionEvent evt) {                                               
         // TODO add your handling code here:
         
     }   
                                        
-    private void Cancel_buttonActionPerformed(java.awt.event.ActionEvent evt)
-    {                                              
+    private void Cancel_buttonActionPerformed(java.awt.event.ActionEvent evt) {                                              
         // TODO add your handling code here:
         this.dispose();
     }       
@@ -335,41 +315,29 @@ public class hi extends javax.swing.JFrame
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) 
-    {
+    public static void main(String args[]) {
 
-        try
-        {
+        try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        } 
-        catch (ClassNotFoundException ex) 
-        {
+        } catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(hi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } 
-        catch (InstantiationException ex) 
-        {
+        } catch (InstantiationException ex) {
             java.util.logging.Logger.getLogger(hi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } 
-        catch (IllegalAccessException ex) 
-        {
+        } catch (IllegalAccessException ex) {
             java.util.logging.Logger.getLogger(hi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } 
-        catch (javax.swing.UnsupportedLookAndFeelException ex)
-        {
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(hi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable()
-        {
-            public void run()
-            {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
                 new hi().setVisible(true);
             }
         });
@@ -389,36 +357,29 @@ public class hi extends javax.swing.JFrame
 
 
 
-class NameComparator implements Comparator<Record>
-{  
-  public int compare(Record e1, Record e2)
-  {
-      return e1.filename.compareToIgnoreCase(e2.filename);
-  }
+class NameComparator implements Comparator<Record>{  
+
+  public int compare(Record e1, Record e2){
+          return e1.filename.compareToIgnoreCase(e2.filename);
+     }
 }  
 
-class DateModifiedComparator implements Comparator<Record>
-{  
+class DateModifiedComparator implements Comparator<Record>{  
 
       DateFormat f = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
   @Override
-  public int compare(Record o1, Record o2) 
-  {
+  public int compare(Record o1, Record o2) {
     // TODO Auto-generated method stub
-    try 
-    {
-        return f.parse(o1.Date_Time).compareTo(f.parse(o2.Date_Time));
-    } 
-    catch (ParseException e) 
-    {
-        throw new IllegalArgumentException(e);
-    }
+    try {
+            return f.parse(o1.Date_Time).compareTo(f.parse(o2.Date_Time));
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
     
   }
 }  
 
-class  userNameComparator implements Comparator<Record>
-{  
+class  userNameComparator implements Comparator<Record>{  
 
    public int compare(Record e1, Record e2) 
         {
