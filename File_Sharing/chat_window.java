@@ -18,76 +18,59 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
 /**
  *
  * @author rockstar
  */
 
-class ClientWorker implements Runnable {
 
-    private Socket target_socket;
-    private DataInputStream din;
-    private DataOutputStream dout;
 
-    public ClientWorker(Socket recv_socket,DataInputStream dis, DataOutputStream dos) {
-        
-            System.out.println("ok13");
-            target_socket = recv_socket;
-            this.din = dis;
-            this.dout = dos;
-        
-    }
+class ClientHandler implements Runnable 
+		{
+                    
+		    Scanner scn = new Scanner(System.in);
+		    private String name;
+		     DataInputStream dis;
+		     DataOutputStream dos;
+		    Socket s=null;
+                    
+		    boolean isloggedin;
+		     
+		    // constructor
+		    public ClientHandler(Socket s, String name,
+		                            DataInputStream dis, DataOutputStream dos) {
+		        this.dis = dis;
+		        this.dos = dos;
+		        this.name = name;
+		        this.s = s;
+		        this.isloggedin=true;
+		    }
+		 
+    private byte[] CreateDataPacket(byte[] cmd, byte[] data) {
+	        byte[] packet = null;
+	        try {
+	            byte[] initialize = new byte[1];
+	            initialize[0] = 2;
+                    
+	            byte[] separator = new byte[1];
+	            separator[0] = 4;
+	            byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
+	            packet = new byte[initialize.length + cmd.length + separator.length + data_length.length + data.length];
 
-    @Override
-    public void run() {
-System.out.println("ok14");
-        RandomAccessFile rw = null;
-        long current_file_pointer = 0;
-        boolean loop_break = false;
-        while (true) {
-            System.out.println("ok15");
-            byte[] initilize = new byte[1];
-            try {
-                din.read(initilize, 0, initilize.length);
-                System.out.println("ok16");
-                System.out.println(initilize);
-                if (initilize[0] == 2) {
-                    System.out.println("ok16");
-                    byte[] cmd_buff = new byte[3];
-                    din.read(cmd_buff, 0, cmd_buff.length);
-                    byte[] recv_data = ReadStream();
-                    switch (Integer.parseInt(new String(cmd_buff))) {
-                        case 124:
-                            rw = new RandomAccessFile("E:\\" + new String(recv_data), "rw");
-                            System.out.println(recv_data);
-                            dout.write(CreateDataPacket("125".getBytes("UTF8"), String.valueOf(current_file_pointer).getBytes("UTF8")));
-                            dout.flush();
-                            break;
-                        case 126:
-                            rw.seek(current_file_pointer);
-                            rw.write(recv_data);                            
-                            current_file_pointer = rw.getFilePointer();
-                            System.out.println("Download percentage: " + ((float)current_file_pointer/rw.length())*100+"%");
-                            dout.write(CreateDataPacket("125".getBytes("UTF8"), String.valueOf(current_file_pointer).getBytes("UTF8")));
-                            dout.flush();
-                            break;
-                        case 127:
-                            if ("Close".equals(new String(recv_data))) {
-                                loop_break = true;
-                            }
-                            break;
-                    }
-                }
-                if (loop_break == true) {
-                    target_socket.close();
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ClientWorker.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
+	            System.arraycopy(initialize, 0, packet, 0, initialize.length);
+	            System.arraycopy(cmd, 0, packet, initialize.length, cmd.length);
+	            System.arraycopy(data_length, 0, packet, initialize.length + cmd.length, data_length.length);
+	            System.arraycopy(separator, 0, packet, initialize.length + cmd.length + data_length.length, separator.length);
+	            System.arraycopy(data, 0, packet, initialize.length + cmd.length + data_length.length + separator.length, data.length);
 
-    private byte[] ReadStream() {
+	        } catch (UnsupportedEncodingException ex) {
+	            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+	        }
+	        return packet;
+	    }
+    private byte[] ReadStream(DataInputStream din) {
         byte[] data_buff = null;
         try {
             int b = 0;
@@ -104,63 +87,11 @@ System.out.println("ok14");
                 byte_offset += byte_read;
             }
         } catch (IOException ex) {
-            Logger.getLogger(ClientWorker.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
         return data_buff;
     }
-
-    private byte[] CreateDataPacket(byte[] cmd, byte[] data) {
-        byte[] packet = null;
-        try {
-            
-            byte[] initialize = new byte[1];
-            initialize[0] = 2;
-            byte[] separator = new byte[1];
-            separator[0] = 4;
-            byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
-            packet = new byte[initialize.length + cmd.length + separator.length + data_length.length + data.length];
-
-            System.arraycopy(initialize, 0, packet, 0, initialize.length);
-            System.arraycopy(cmd, 0, packet, initialize.length, cmd.length);
-            System.arraycopy(data_length, 0, packet, initialize.length + cmd.length, data_length.length);
-            System.arraycopy(separator, 0, packet, initialize.length + cmd.length + data_length.length, separator.length);
-            System.arraycopy(data, 0, packet, initialize.length + cmd.length + data_length.length + separator.length, data.length);
-
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(ClientWorker.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return packet;
-    }
-}
-
-
-class ClientHandler implements Runnable 
-		{
                     
-		    Scanner scn = new Scanner(System.in);
-		    private String name;
-		    final DataInputStream dis;
-		    final DataOutputStream dos;
-		    Socket s=null;
-                    private ServerSocket    server   = null;
-		    boolean isloggedin;
-		     
-		    // constructor
-		    public ClientHandler(Socket s, String name,
-		                            DataInputStream dis, DataOutputStream dos) {
-		        this.dis = dis;
-		        this.dos = dos;
-		        this.name = name;
-		        this.s = s;
-		        this.isloggedin=true;
-		    }
-		 
-                    public void filedownload(){
-                        if(s!=null)
-                            System.out.println("ok2");
-                    new Thread(new ClientWorker(s,dis,dos)).start();
-					
-                    }
                     
 		    @Override
 		    public void run() {
@@ -172,10 +103,10 @@ class ClientHandler implements Runnable
 		                {
 		                    // if the recipient is found, write on its
 		                    // output stream
-                                    
+                   //dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer).getBytes("UTF8")));
 		                    if (!mc.name.equals(this.name) && mc.isloggedin==true) 
 		                    {
-		                        mc.dos.writeUTF("\t"+"'"+this.name+"'" + " Joined");
+		                        mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("\t"+"'"+this.name+"'" + " Joined").getBytes("UTF8")));
 		                        
 		                    }
 		                }
@@ -185,7 +116,7 @@ class ClientHandler implements Runnable
 		                    // output stream
 		                    if (mc.isloggedin==true)
 		                    {
-		                        this.dos.writeUTF("\t"+"'"+mc.name+"'" + " Joined");
+		                        this.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("\t"+"'"+mc.name+"'" + " Joined").getBytes("UTF8")));
 		                        
 		                    }
 		                }
@@ -193,20 +124,59 @@ class ClientHandler implements Runnable
 		                 
 		                e.printStackTrace();
 		            }
+                                
 		        while (true) 
 		        {
 		            try
 		            {
-		                // receive the string
-		                received = dis.readUTF();
-		                if(received.equals("rockstar_you_are_great_uploading")){
-                                    System.out.println("ok1");
-                                        filedownload();
-                                
-                                }
 		                
-		                 
-		                if(received.equals("logout")){
+                               
+                               if (dis.read() == 2) {
+	                        byte[] cmd_buff = new byte[3];
+	                        dis.read(cmd_buff, 0, cmd_buff.length);
+	                        byte[] recv_buff = ReadStream(dis);
+                                
+	                        switch (Integer.parseInt(new String(cmd_buff))){
+                                    case 111:
+                                        for (ClientHandler mc : chat_window.ar) 
+                                        {
+                                            if(!mc.name.equals(this.name)){
+                                           mc.dos.write(CreateDataPacket("111".getBytes("UTF8"), recv_buff));
+                                           mc.dos.flush();
+                                                   }
+                                        }
+                                        break;
+                                    case 121:
+                                        for (ClientHandler mc : chat_window.ar) 
+                                        {
+                                        if(!mc.name.equals(this.name)){
+                                        mc.dos.write(CreateDataPacket("121".getBytes("UTF8"), recv_buff));
+                                        mc.dos.flush();
+                                        }
+                                        }
+                                        break;
+                                    case 131:
+                                        for (ClientHandler mc : chat_window.ar) 
+                                        {
+                                            if(!mc.name.equals(this.name)){
+                                        mc.dos.write(CreateDataPacket("131".getBytes("UTF8"), recv_buff));
+                                       mc.dos.flush();
+                                        }
+                                        }
+                                        break;
+                                    case 151:
+                                        for (ClientHandler mc : chat_window.ar) 
+                                        {
+                                            if(!mc.name.equals(this.name)){
+                                        mc.dos.write(CreateDataPacket("151".getBytes("UTF8"), recv_buff));
+                                           mc.dos.flush();
+                                        }
+                                        }
+                                        break;
+                                case 141:
+                                    received=new String(recv_buff);
+                                    System.out.println(received);
+                                if(received.equals("logout")){
 		                    this.isloggedin=false;
                                     
                                     
@@ -218,7 +188,8 @@ class ClientHandler implements Runnable
 		                    // output stream
 		                    if (mc.isloggedin==true)
 		                    {
-		                        mc.dos.writeUTF("\t"+"'"+this.name+"'" + " logeed out");
+                                        mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("\t"+"'"+this.name+"'" + " logeed out").getBytes("UTF8")));
+		                        mc.dos.flush();
 		                        
 		                    }
 		                }
@@ -229,7 +200,7 @@ class ClientHandler implements Runnable
 		                    break;
 		                }
 		               
-                                if(received.contains("@")){
+                                else if(received.contains("@")){
                                     StringTokenizer st = new StringTokenizer(received, "@");
                                     String MsgToSend = st.nextToken();
                                     String recipient = st.nextToken();
@@ -244,7 +215,8 @@ class ClientHandler implements Runnable
                     // output stream
                                         if (mc.name.equals(recipient) || mc.name.equals(this.name) && mc.isloggedin==true) 
                                             {
-                                                mc.dos.writeUTF("@"+this.name+" : "+MsgToSend);
+                                              mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("@"+this.name+" : "+MsgToSend).getBytes("UTF8")));
+                                               mc.dos.flush();
                                                     break;
                                             }
                                         }
@@ -258,17 +230,23 @@ class ClientHandler implements Runnable
 		                    // output stream
 		                    if (mc.isloggedin==true) 
 		                    {
-		                        mc.dos.writeUTF(this.name+" : "+received);
+                                        mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), (this.name+" : "+received).getBytes("UTF8")));
+		                        mc.dos.flush();
 		                        
 		                    }
 		                }
                                 }
+                                break;
+                               }
+                               }
 		            } catch (IOException e) {
 		                 
 		                e.printStackTrace();
 				break;
 		            }
-		             
+		             if(this.isloggedin==false){
+                                    break;
+                             }
 		        }
 		        try
 		        {
@@ -302,6 +280,11 @@ static Vector<ClientHandler> ar = new Vector<>();
         
         }
     
+       
+        public void main_chat(){
+                   
+        
+        }
     
         public void serverchat() {
             
@@ -334,7 +317,7 @@ static Vector<ClientHandler> ar = new Vector<>();
 	            Thread t = new Thread(mtch);
 	             
 	            System.out.println("Adding "+name+" to active client list");
-	 
+                            
 	            // add this client to active clients list
 	            ar.add(mtch);
 	 			

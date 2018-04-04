@@ -176,6 +176,14 @@ public class Client_Main extends javax.swing.JFrame {
                     this.hide();
                     User_window uw = new User_window(this.socket,user);
                     uw.setVisible(true);
+                    Thread t1 = new Thread( new Runnable(){
+                        @Override
+                       public  void run(){
+                            uw.datatransferread();
+                        }
+              });
+              t1.start();
+                    
             }
             
             

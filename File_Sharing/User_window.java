@@ -8,6 +8,7 @@ package file_sharing;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
@@ -43,6 +44,10 @@ public class User_window extends javax.swing.JFrame {
     public ServerSocket    server   = null;
     String rcv = "";
     String user;
+    RandomAccessFile rw;
+    
+  
+    
     public User_window() {
         initComponents();
     }
@@ -51,7 +56,7 @@ public User_window(Socket socket ,String user) {
         
         this.socket=socket;
          this.user = user;
-        this.clientchat();
+        
         this.username.setText(user);
        
     }
@@ -65,8 +70,8 @@ public void logout(){
         public void run() {
             try {
                
-                
-                dos.writeUTF("logout");
+                dos.write(CreateDataPacket("141".getBytes("UTF8"), "logout".getBytes("UTF8")));
+                dos.flush();
             } catch (IOException e) {
                 e.printStackTrace();
         }}});
@@ -86,120 +91,115 @@ public void additem(){
         
 }
 
-public void file_download(){
- new Thread(new ClientWorker(socket,dis,dos)).start();
-					
 
-}
 	    
-public void file_upload(){
-    try{
-        System.out.println("ok12");
-                    dis = new DataInputStream(socket.getInputStream());
-	            dos = new DataOutputStream(socket.getOutputStream());
-          dos.write(this.CreateDataPacket("124".getBytes("UTF8"), file.getName().getBytes("UTF8")));
-                dos.flush();
-                System.out.println(this.CreateDataPacket("124".getBytes("UTF8"), file.getName().getBytes("UTF8")));
-                RandomAccessFile rw = new RandomAccessFile(file, "r");
-                long current_file_pointer = 0;
-                boolean loop_break = false;
-                System.out.println("ok4");
-                while (true) {
-                    if (dis.read() == 2) {
-                        byte[] cmd_buff = new byte[3];
-                        dis.read(cmd_buff, 0, cmd_buff.length);
-                        byte[] recv_buff = this.ReadStream(dis);
-                        switch (Integer.parseInt(new String(cmd_buff))) {
-                            case 125:
-                                current_file_pointer = Long.valueOf(new String(recv_buff));
-                                int buff_len = (int) (rw.length() - current_file_pointer < 100000 ? rw.length() - current_file_pointer : 100000);
-                                byte[] temp_buff = new byte[buff_len];
-                                if (current_file_pointer != rw.length()) {
-                                    rw.seek(current_file_pointer);
-                                    rw.read(temp_buff, 0, temp_buff.length);
-                                    dos.write(this.CreateDataPacket("126".getBytes("UTF8"), temp_buff));
-                                    dos.flush();
-                                    System.out.println("Upload percentage: " + ((float)current_file_pointer/rw.length())*100+"%");
-                                } else {
-                                    loop_break = true;
-                                }
-                                break;
-                        }
-                    }
-                    if (loop_break == true) {
-                        System.out.println("Stop Server informed");
-                        dos.write(this.CreateDataPacket("127".getBytes("UTF8"), "Close".getBytes("UTF8")));
-                        dos.flush();
-                        socket.close();
-                        System.out.println("Client Socket Closed");
-                        break;
-                    }
-                }
-    }catch(IOException e){}
 
-}
 
-public void clientchat() {
-    try{
-    this.dis = new DataInputStream(this.socket.getInputStream());
-    this.dos = new DataOutputStream(this.socket.getOutputStream());
-    
-    // sendMessage thread
-    
-    // readMessage thread
-    Thread sendMessage = new Thread(new Runnable()
-    {
-        @Override
-        public void run() {
-            try {
-               
-                String name = user;
-                dos.writeUTF(name);
-            } catch (IOException e) {
-                e.printStackTrace();
-        }}});
-        sendMessage.start();
-        
-    Thread readMessage;
-        readMessage = new Thread(new Runnable()
-        {
+
+
+
+                 public void datatransferread(){
+                     
+        try {
+            dis = new DataInputStream(this.socket.getInputStream());
+            dos = new DataOutputStream(this.socket.getOutputStream());
             
-            @Override
-            
-            public void run() {
+            Thread t = new Thread(new Runnable(){
                 
-                while (true) {
+                public void run(){
                     try {
-                        // read the message sent to this client
-                        rcv = dis.readUTF();
-                        if(rcv.contains("Joined")){
-                                additem();
-                        }
-                        else if(rcv.contains("rockstar_you_are_great_downloading")){
-                                    file_download();
-                        }
-                        else if(rcv.contains("rockstar_you_are_great_uploading")){
-                                        file_upload();
-                                }
                         
-                        print();
-                        
+                        String name = user;
+                        dos.writeUTF(name);
                     } catch (IOException e) {
-                        
                         e.printStackTrace();
-                        break;
                     }
                 }
-            }
+            });
+            t.start();
+            Thread readMessage = new Thread(new Runnable()
+            {
+                
+                @Override
+                
+                public void run() {
+                    try{
+                        
+                        long current_file_pointer_read = 0;
+                        long current_file_pointer_write = 0;
+                        while (true) {
+                            if (dis.read() == 2) {
+                                byte[] cmd_buff = new byte[3];
+                                dis.read(cmd_buff, 0, cmd_buff.length);
+                                byte[] recv_buff = ReadStream(dis);
+                                switch (Integer.parseInt(new String(cmd_buff))){
+                                    case 111:
+                                        
+                                        rw = new RandomAccessFile("G:\\" + new String(recv_buff), "rw");
+                                        dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer_read).getBytes("UTF8")));
+                                        
+                                        dos.flush();
+                                        break;
+                                    case 121:
+                                        rw.seek(current_file_pointer_read);
+                                        rw.write(recv_buff);
+                                        current_file_pointer_read = rw.getFilePointer();
+                                        System.out.println("Download percentage: " + ((float)current_file_pointer_read/rw.length())*100+"%");
+                                        dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer_read).getBytes("UTF8")));
+                                        dos.flush();
+                                        break;
+                                    case 131:
+                                        if ("Close".equals(new String(recv_buff))) {
+                                            rw.close();
+                                        }
+                                        break;
+                                    case 141:
+                                        rcv= new String(recv_buff);
+                                        if(rcv.contains("Joined")){
+                                            additem();
+                                        }
+                                        print();
+                                        break;
+                                    case 151:
+                                        current_file_pointer_write = Long.valueOf(new String(recv_buff));
+                                        System.out.println(current_file_pointer_write);
+                                        int buff_len = (int) (rw.length() - current_file_pointer_write < 20000 ? rw.length() - current_file_pointer_write : 20000);
+                                        byte[] temp_buff = new byte[buff_len];
+                                        if (current_file_pointer_write != rw.length()) {
+                                            rw.seek(current_file_pointer_write);
+                                            rw.read(temp_buff, 0, temp_buff.length);
+                                            dos.write(CreateDataPacket("121".getBytes("UTF8"), temp_buff));
+                                            dos.flush();
+                                            System.out.println("Upload percentage: " + ((float)current_file_pointer_write/rw.length())*100+"%");
+                                        } else {
+                                            dos.write(CreateDataPacket("131".getBytes("UTF8"), "Close".getBytes("UTF8")));
+                                            dos.flush();
+                                            
+                                        }
+                                        break;
+                                }
+                            }
+                            
+                        }
+                    }
+                    catch(IOException e){}
+                    
+                }
+                
+                
+            });
+            
+            readMessage.start();
+        } catch (IOException ex) {
+            Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                     
+                     
+                 }
 
-        
-        });
-    
-    readMessage.start();
-    
-    }
-    catch(IOException e){}
-	}
+               
+
+
 
 
     private byte[] CreateDataPacket(byte[] cmd, byte[] data) {
@@ -207,7 +207,7 @@ public void clientchat() {
 	        try {
 	            byte[] initialize = new byte[1];
 	            initialize[0] = 2;
-                    System.out.println(initialize);
+                    
 	            byte[] separator = new byte[1];
 	            separator[0] = 4;
 	            byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
@@ -441,26 +441,20 @@ public void clientchat() {
         msg=this.chat_text.getText();
         chat_text.setText("");
        
-    
-        Thread sendMessage = new Thread(new Runnable()
-    {
-        @Override
-        public void run() {
-            /*
-            }*/
-            
-            
-                
+   
                 // read the message to deliver.
                 
                 
                 try {
                     // write on the output stream
                     if(msg!=null){
-                    dos.writeUTF(msg);
+                    
                    
+                  dos.write(CreateDataPacket("141".getBytes("UTF8"), msg.getBytes("UTF8")));
+                                      dos.flush();
+                 
                     
-                    
+                  
                    
                     }
                 } catch (IOException e) {
@@ -469,10 +463,8 @@ public void clientchat() {
                 }
                
             
-        }
-    });
-         sendMessage.start();
         
+
     }//GEN-LAST:event_sendActionPerformed
 
     private void chat_textActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chat_textActionPerformed
@@ -539,36 +531,20 @@ public void clientchat() {
                         char cbuf [] = null;
                         file = jf.getSelectedFile();
                         file_name_text.setText(file.getAbsolutePath());
-                        
                     }
     }//GEN-LAST:event_browseActionPerformed
 
     private void Send_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Send_fileActionPerformed
         // TODO add your handling code here:
-         Thread sendMessage = new Thread(new Runnable()
-    {
-        @Override
-        public void run() {
-            try {
-               
-                
-                dos.writeUTF("rockstar_you_are_great_uploading");
-                System.out.println("ok1");
-            } catch (IOException e) {
-                e.printStackTrace();
-        }}});
-        sendMessage.start();
      
-        Thread t1 = new Thread( new Runnable(){
-                        
-                        public void run(){
-                                  file_upload();
-                        }
-                        
-                        }
-                        
-                        
-                        );
+        try {
+                
+                this.rw = new RandomAccessFile(this.file, "r");
+                     dos.write(CreateDataPacket("111".getBytes("UTF8"), this.file.getName().getBytes("UTF8")));
+                     dos.flush();
+                 } catch (IOException ex) {
+                     Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
+                 }
     }//GEN-LAST:event_Send_fileActionPerformed
 
     /**
