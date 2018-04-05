@@ -35,7 +35,7 @@ class ClientHandler implements Runnable
 		     DataInputStream dis;
 		     DataOutputStream dos;
 		    Socket s=null;
-                    
+                    String file_recv="";
 		    boolean isloggedin;
 		     
 		    // constructor
@@ -125,6 +125,7 @@ class ClientHandler implements Runnable
 		                e.printStackTrace();
 		            }
                                 
+                                
 		        while (true) 
 		        {
 		            try
@@ -137,11 +138,36 @@ class ClientHandler implements Runnable
 	                        byte[] recv_buff = ReadStream(dis);
                                 
 	                        switch (Integer.parseInt(new String(cmd_buff))){
+                                    
+                                    case 101:
+                                           this.file_recv = new String(recv_buff);
+                                           StringTokenizer rc = new StringTokenizer(this.file_recv, "@");
+                                            String file_name = rc.nextToken();
+                                            this.file_recv = rc.nextToken();
+                                           for (ClientHandler mc : chat_window.ar) 
+                                        {
+                                            if(mc.name.equals(this.file_recv)){
+                                           mc.dos.write(CreateDataPacket("101".getBytes("UTF8"), (file_name + " -> "+ this.name).getBytes("UTF8")));
+                                           mc.dos.flush();
+                                                   }
+                                        }
+                                        break;
                                     case 111:
                                         for (ClientHandler mc : chat_window.ar) 
                                         {
-                                            if(!mc.name.equals(this.name)){
+                                            if(mc.name.equals(this.file_recv)){
                                            mc.dos.write(CreateDataPacket("111".getBytes("UTF8"), recv_buff));
+                                           mc.dos.flush();
+                                                   }
+                                        }
+                                        break;
+                                        case 161:
+                                            
+                                            this.file_recv = new String(recv_buff);
+                                        for (ClientHandler mc : chat_window.ar) 
+                                        {
+                                            if(mc.name.equals(this.file_recv)){
+                                           mc.dos.write(CreateDataPacket("161".getBytes("UTF8"), recv_buff));
                                            mc.dos.flush();
                                                    }
                                         }
@@ -149,7 +175,7 @@ class ClientHandler implements Runnable
                                     case 121:
                                         for (ClientHandler mc : chat_window.ar) 
                                         {
-                                        if(!mc.name.equals(this.name)){
+                                        if(mc.name.equals(this.file_recv)){
                                         mc.dos.write(CreateDataPacket("121".getBytes("UTF8"), recv_buff));
                                         mc.dos.flush();
                                         }
@@ -158,7 +184,7 @@ class ClientHandler implements Runnable
                                     case 131:
                                         for (ClientHandler mc : chat_window.ar) 
                                         {
-                                            if(!mc.name.equals(this.name)){
+                                            if(mc.name.equals(this.file_recv)){
                                         mc.dos.write(CreateDataPacket("131".getBytes("UTF8"), recv_buff));
                                        mc.dos.flush();
                                         }
@@ -167,7 +193,7 @@ class ClientHandler implements Runnable
                                     case 151:
                                         for (ClientHandler mc : chat_window.ar) 
                                         {
-                                            if(!mc.name.equals(this.name)){
+                                            if(mc.name.equals(this.file_recv)){
                                         mc.dos.write(CreateDataPacket("151".getBytes("UTF8"), recv_buff));
                                            mc.dos.flush();
                                         }

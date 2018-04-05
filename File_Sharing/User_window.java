@@ -16,6 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -45,7 +46,8 @@ public class User_window extends javax.swing.JFrame {
     String rcv = "";
     String user;
     RandomAccessFile rw;
-    
+     String fn;
+    String file_recv="";
   
     
     public User_window() {
@@ -127,15 +129,49 @@ public void additem(){
                         
                         long current_file_pointer_read = 0;
                         long current_file_pointer_write = 0;
+                       
                         while (true) {
                             if (dis.read() == 2) {
                                 byte[] cmd_buff = new byte[3];
                                 dis.read(cmd_buff, 0, cmd_buff.length);
                                 byte[] recv_buff = ReadStream(dis);
                                 switch (Integer.parseInt(new String(cmd_buff))){
+                                    case 101:
+                                            recieve_popup r = new recieve_popup();
+                                            r.setVisible(true);
+                                            file_recv = new String(recv_buff);
+                                            r.msg.setText(file_recv);
+                                           StringTokenizer rc = new StringTokenizer(file_recv, " -> ");
+                                            String file_name = rc.nextToken();
+                                            file_recv = rc.nextToken();
+                                            Thread q = new Thread(new Runnable(){
+                                                
+                                                public void run(){
+                                            while(true){
+                                                System.out.println(r.k);
+                                            if(r.k==1){
+                                                
+                                                    try {
+                                                        dos.write(CreateDataPacket("161".getBytes("UTF8"), file_recv.getBytes("UTF8")));
+                                                        dos.flush();
+                                                    } catch (IOException ex) {
+                                                        Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
+                                                    }
+                                                   fn= r.folder.getName();
+                                                   System.out.println("hello");
+                                                    break;
+                                                
+                                            }
+                                            if (r.k==2){
+                                                break;
+                                            }
+                                            }
+                                                }
+                                            });
+                                        break;
                                     case 111:
                                         
-                                        rw = new RandomAccessFile("G:\\" + new String(recv_buff), "rw");
+                                        rw = new RandomAccessFile(fn + new String(recv_buff), "rw");
                                         dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer_read).getBytes("UTF8")));
                                         
                                         dos.flush();
@@ -177,6 +213,17 @@ public void additem(){
                                             
                                         }
                                         break;
+                                    case 161:
+                                        try {
+                
+                                            rw = new RandomAccessFile(file, "r");
+                                            dos.write(CreateDataPacket("111".getBytes("UTF8"), file.getName().getBytes("UTF8")));
+                                            dos.flush();
+                                            } catch (IOException ex) {
+                                            Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
+                                        break;
+                                        
                                 }
                             }
                             
@@ -256,6 +303,7 @@ public void additem(){
     private void initComponents() {
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
+        jPopupMenu2 = new javax.swing.JPopupMenu();
         jScrollPane1 = new javax.swing.JScrollPane();
         chat_area = new javax.swing.JTextArea();
         chat_text = new javax.swing.JTextField();
@@ -275,10 +323,10 @@ public void additem(){
         chat_area.setColumns(20);
         chat_area.setRows(5);
         chat_area.addInputMethodListener(new java.awt.event.InputMethodListener() {
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
-            }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 chat_areaInputMethodTextChanged(evt);
+            }
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
         });
         chat_area.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
@@ -535,16 +583,17 @@ public void additem(){
     }//GEN-LAST:event_browseActionPerformed
 
     private void Send_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Send_fileActionPerformed
-        // TODO add your handling code here:
-     
         try {
+            // TODO add your handling code here:
+            String s= file.getName()+"@"+ users.getSelectedItem().toString();
+            dos.write(CreateDataPacket("101".getBytes("UTF8"), s.getBytes("UTF8")));
+            dos.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
                 
-                this.rw = new RandomAccessFile(this.file, "r");
-                     dos.write(CreateDataPacket("111".getBytes("UTF8"), this.file.getName().getBytes("UTF8")));
-                     dos.flush();
-                 } catch (IOException ex) {
-                     Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
-                 }
+                
+        
     }//GEN-LAST:event_Send_fileActionPerformed
 
     /**
@@ -593,6 +642,7 @@ public void additem(){
     private javax.swing.JButton history;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPopupMenu jPopupMenu1;
+    private javax.swing.JPopupMenu jPopupMenu2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton send;
     private javax.swing.JTextField username;
