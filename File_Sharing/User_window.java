@@ -191,6 +191,7 @@ public void additem(){
                                     case 131:
                                         if ("Close".equals(new String(recv_buff))) {
                                             rw.close();
+                                            current_file_pointer_read = 0;
                                         }
                                         break;
                                     case 141:
@@ -214,6 +215,7 @@ public void additem(){
                                         } else {
                                             dos.write(CreateDataPacket("131".getBytes("UTF8"), "Close".getBytes("UTF8")));
                                             dos.flush();
+                                             current_file_pointer_write = 0;
                                             
                                         }
                                         break;
