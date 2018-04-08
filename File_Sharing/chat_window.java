@@ -147,7 +147,7 @@ class ClientHandler implements Runnable
                                            for (ClientHandler mc : chat_window.ar) 
                                         {
                                             if(mc.name.equals(this.file_recv)){
-                                           mc.dos.write(CreateDataPacket("101".getBytes("UTF8"), (file_name + " -> "+ this.name).getBytes("UTF8")));
+                                           mc.dos.write(CreateDataPacket("101".getBytes("UTF8"), (file_name + "@"+ this.name).getBytes("UTF8")));
                                            mc.dos.flush();
                                                    }
                                         }
@@ -164,6 +164,7 @@ class ClientHandler implements Runnable
                                         case 161:
                                             
                                             this.file_recv = new String(recv_buff);
+                                          
                                         for (ClientHandler mc : chat_window.ar) 
                                         {
                                             if(mc.name.equals(this.file_recv)){
@@ -201,7 +202,7 @@ class ClientHandler implements Runnable
                                         break;
                                 case 141:
                                     received=new String(recv_buff);
-                                    System.out.println(received);
+                                    
                                 if(received.equals("logout")){
 		                    this.isloggedin=false;
                                     

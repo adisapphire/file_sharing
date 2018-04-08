@@ -140,10 +140,11 @@ public void additem(){
                                             recieve_popup r = new recieve_popup();
                                             r.setVisible(true);
                                             file_recv = new String(recv_buff);
-                                            r.msg.setText(file_recv);
-                                           StringTokenizer rc = new StringTokenizer(file_recv, " -> ");
+                                            
+                                           StringTokenizer rc = new StringTokenizer(file_recv, "@");
                                             String file_name = rc.nextToken();
                                             file_recv = rc.nextToken();
+                                            r.msg.setText(file_name+"------->>>>"+file_recv);
                                             Thread q = new Thread(new Runnable(){
                                                 
                                                 public void run(){
@@ -157,8 +158,10 @@ public void additem(){
                                                     } catch (IOException ex) {
                                                         Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
                                                     }
-                                                   fn= r.folder.getName();
-                                                   System.out.println("hello");
+                                                   fn= r.folder.toString();
+                                                   if(fn.charAt(fn.length()-1)!='\\')
+                                                       fn=fn+"\\";
+                                                   
                                                     break;
                                                 
                                             }
@@ -168,6 +171,7 @@ public void additem(){
                                             }
                                                 }
                                             });
+                                            q.start();
                                         break;
                                     case 111:
                                         

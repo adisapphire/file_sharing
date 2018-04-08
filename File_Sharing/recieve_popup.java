@@ -38,7 +38,7 @@ public class recieve_popup extends javax.swing.JFrame {
    
     }
 public void cloose(){
-        this.setVisible(false);
+       this.dispose();
 }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -128,12 +128,14 @@ public void cloose(){
                                 this.file_name.setText(folder.toString());
 			}
 		}
+                System.out.println(folder.toString());
     }//GEN-LAST:event_browseActionPerformed
 
     private void recieveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recieveActionPerformed
         // TODO add your handling code here:
         this.k=1;
-        this.setVisible(false);
+        
+        this.dispose();
     }//GEN-LAST:event_recieveActionPerformed
 
     /**
