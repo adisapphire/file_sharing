@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
+import static javax.swing.Spring.constant;
 
 /**
  *
@@ -46,11 +47,13 @@ public class User_window extends javax.swing.JFrame {
     String rcv = "";
     String user;
     RandomAccessFile rw;
-     String fn;
+     long lengt;
+    String fn;
     String file_recv="";
+    ProgressBarExample m;
   
     
-    public User_window() {
+public User_window() {
         initComponents();
     }
 public User_window(Socket socket ,String user) {
@@ -94,14 +97,13 @@ public void additem(){
 }
 
 
-	    
+        
 
 
 
 
 
-                 public void datatransferread(){
-                     
+public void datatransferread(){                
         try {
             dis = new DataInputStream(this.socket.getInputStream());
             dos = new DataOutputStream(this.socket.getOutputStream());
@@ -141,17 +143,23 @@ public void additem(){
                                             r.setVisible(true);
                                             file_recv = new String(recv_buff);
                                             
-                                           StringTokenizer rc = new StringTokenizer(file_recv, "@");
+                                            StringTokenizer rc = new StringTokenizer(file_recv, "@");
                                             String file_name = rc.nextToken();
                                             file_recv = rc.nextToken();
+                                            lengt=Long.parseLong(rc.nextToken());
+                                            System.out.println("***** length 101 *******"+lengt);
                                             r.msg.setText(file_name+"------->>>>"+file_recv);
+                                            m=new ProgressBarExample();    
+                                            m.setVisible(true); 
+                                               
                                             Thread q = new Thread(new Runnable(){
+                                            
                                                 
-                                                public void run(){
+                                            public void run(){
                                             while(true){
-                                                System.out.println(r.k);
-                                            if(r.k==1){
-                                                
+                                                System.out.println(r.k+" reciver ");
+                                                if(r.k==1){
+                                                    System.out.println("** come int r. k *****"+r.k);
                                                     try {
                                                         dos.write(CreateDataPacket("161".getBytes("UTF8"), file_recv.getBytes("UTF8")));
                                                         dos.flush();
@@ -164,10 +172,10 @@ public void additem(){
                                                    
                                                     break;
                                                 
-                                            }
-                                            if (r.k==2){
-                                                break;
-                                            }
+                                                }
+                                                if (r.k==2){
+                                                    break;
+                                                }
                                             }
                                                 }
                                             });
@@ -182,9 +190,15 @@ public void additem(){
                                         break;
                                     case 121:
                                         rw.seek(current_file_pointer_read);
+                                        
                                         rw.write(recv_buff);
                                         current_file_pointer_read = rw.getFilePointer();
-                                        System.out.println("Download percentage: " + ((float)current_file_pointer_read/rw.length())*100+"%");
+//                                            public static void main(String[] args) {    
+                                           
+                                        m.iterate(current_file_pointer_read*100/lengt);    
+
+                                        System.out.println("Download percentage: " + ((float)current_file_pointer_read/lengt)*100+"%");
+                                        System.out.println("******* in 121 ********"+lengt+" ----- "+(float)current_file_pointer_read);
                                         dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer_read).getBytes("UTF8")));
                                         dos.flush();
                                         break;
@@ -192,6 +206,7 @@ public void additem(){
                                         if ("Close".equals(new String(recv_buff))) {
                                             rw.close();
                                             current_file_pointer_read = 0;
+                                            
                                         }
                                         break;
                                     case 141:
@@ -211,18 +226,23 @@ public void additem(){
                                             rw.read(temp_buff, 0, temp_buff.length);
                                             dos.write(CreateDataPacket("121".getBytes("UTF8"), temp_buff));
                                             dos.flush();
+                                            System.out.println("******* in 151 ********"+rw.length()+"  "+(float)current_file_pointer_write);
+                                                    
+                                                  
+                                            
                                             System.out.println("Upload percentage: " + ((float)current_file_pointer_write/rw.length())*100+"%");
                                         } else {
                                             dos.write(CreateDataPacket("131".getBytes("UTF8"), "Close".getBytes("UTF8")));
                                             dos.flush();
-                                             current_file_pointer_write = 0;
                                             
                                         }
                                         break;
                                     case 161:
                                         try {
-                
+                                            
                                             rw = new RandomAccessFile(file, "r");
+                                            lengt=rw.length();
+                                            System.out.println("********** file length int 161 ********* "+ lengt);
                                             dos.write(CreateDataPacket("111".getBytes("UTF8"), file.getName().getBytes("UTF8")));
                                             dos.flush();
                                             } catch (IOException ex) {
@@ -256,27 +276,27 @@ public void additem(){
 
 
     private byte[] CreateDataPacket(byte[] cmd, byte[] data) {
-	        byte[] packet = null;
-	        try {
-	            byte[] initialize = new byte[1];
-	            initialize[0] = 2;
+            byte[] packet = null;
+            try {
+                byte[] initialize = new byte[1];
+                initialize[0] = 2;
                     
-	            byte[] separator = new byte[1];
-	            separator[0] = 4;
-	            byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
-	            packet = new byte[initialize.length + cmd.length + separator.length + data_length.length + data.length];
+                byte[] separator = new byte[1];
+                separator[0] = 4;
+                byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
+                packet = new byte[initialize.length + cmd.length + separator.length + data_length.length + data.length];
 
-	            System.arraycopy(initialize, 0, packet, 0, initialize.length);
-	            System.arraycopy(cmd, 0, packet, initialize.length, cmd.length);
-	            System.arraycopy(data_length, 0, packet, initialize.length + cmd.length, data_length.length);
-	            System.arraycopy(separator, 0, packet, initialize.length + cmd.length + data_length.length, separator.length);
-	            System.arraycopy(data, 0, packet, initialize.length + cmd.length + data_length.length + separator.length, data.length);
+                System.arraycopy(initialize, 0, packet, 0, initialize.length);
+                System.arraycopy(cmd, 0, packet, initialize.length, cmd.length);
+                System.arraycopy(data_length, 0, packet, initialize.length + cmd.length, data_length.length);
+                System.arraycopy(separator, 0, packet, initialize.length + cmd.length + data_length.length, separator.length);
+                System.arraycopy(data, 0, packet, initialize.length + cmd.length + data_length.length + separator.length, data.length);
 
-	        } catch (UnsupportedEncodingException ex) {
-	            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-	        }
-	        return packet;
-	    }
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return packet;
+        }
     private byte[] ReadStream(DataInputStream din) {
         byte[] data_buff = null;
         try {
@@ -504,7 +524,7 @@ public void additem(){
                     if(msg!=null){
                     
                    
-                  dos.write(CreateDataPacket("141".getBytes("UTF8"), msg.getBytes("UTF8")));
+                    dos.write(CreateDataPacket("141".getBytes("UTF8"), msg.getBytes("UTF8")));
                                       dos.flush();
                  
                     
@@ -591,7 +611,7 @@ public void additem(){
     private void Send_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Send_fileActionPerformed
         try {
             // TODO add your handling code here:
-            String s= file.getName()+"@"+ users.getSelectedItem().toString();
+            String s= file.getName()+"@"+ users.getSelectedItem().toString()+"@"+file.length();
             dos.write(CreateDataPacket("101".getBytes("UTF8"), s.getBytes("UTF8")));
             dos.flush();
         } catch (IOException ex) {
