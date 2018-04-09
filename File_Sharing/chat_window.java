@@ -225,25 +225,34 @@ class ClientHandler implements Runnable
                                             break;
                                     }
 		               
-                                    else if(received.contains("@")){
-                                        StringTokenizer st = new StringTokenizer(received, "@");
-                                        String MsgToSend = st.nextToken();
-                                        String recipient = st.nextToken();
+                                    else if(received.contains("#")){
+                                        StringTokenizer st = new StringTokenizer(received, " ");
+                                        String MsgToSend ="";
+                                        String recipient = "";
+                                        while (st.hasMoreTokens()){
+                                            String token = st.nextToken();
+                                            System.out.println(token);
+                                            if(token.indexOf('#')>=0){
+                                                System.out.println("******  ha aa gya # ********");
+                                                StringBuilder msg = new StringBuilder (token);
+                                                msg.deleteCharAt(0);
+                                                MsgToSend+=msg.toString();
+                                            }
+//                                            else{
+                                                recipient+=token+" ";
+//                                            }
+                                        }
 
-
-
-                    // search for the recipient in the connected devices list.
-                    // ar is the vector storing client of active users
                                             for (ClientHandler mc : chat_window.ar) 
                                             {
-                        // if the recipient is found, write on its
-                        // output stream
-                                            if (mc.name.equals(recipient) || mc.name.equals(this.name) && mc.isloggedin==true) 
+
+                                            if (mc.name.equals(MsgToSend) && mc.isloggedin==true) 
                                                 {
-                                                  mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("@"+this.name+" : "+MsgToSend).getBytes("UTF8")));
+                                                  mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("#"+MsgToSend+" : "+recipient).getBytes("UTF8")));
                                                    mc.dos.flush();
                                                         break;
                                                 }
+                                            
                                             }
 
                                     }
