@@ -144,11 +144,11 @@ class ClientHandler implements Runnable
                                            StringTokenizer rc = new StringTokenizer(this.file_recv, "@");
                                             String file_name = rc.nextToken();
                                             this.file_recv = rc.nextToken();
-                                            String lengt = rc.nextToken();
+                                          String length = rc.nextToken();
                                            for (ClientHandler mc : chat_window.ar) 
                                         {
                                            if(mc.name.equals(this.file_recv)){
-                                           mc.dos.write(CreateDataPacket("101".getBytes("UTF8"), (file_name + "@"+ this.name+"@"+lengt).getBytes("UTF8")));
+                                           mc.dos.write(CreateDataPacket("101".getBytes("UTF8"), (file_name + "@"+ this.name+"@"+length).getBytes("UTF8")));
                                            mc.dos.flush();
                                                    }
                                         }
@@ -204,69 +204,84 @@ class ClientHandler implements Runnable
                                 case 141:
                                     received=new String(recv_buff);
                                     
-                                    if(received.equals("logout")){
-                                            this.isloggedin=false;
-                                            chat_window.i--;
-                                            chat_window.uname = this.name;
-                                            for (ClientHandler mc : chat_window.ar){
-                                                // if the recipient is found, write on its
-                                                // output stream
-                                                if (mc.isloggedin==true)
-                                                {
-                                                    mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("\t"+"'"+this.name+"'" + " logeed out").getBytes("UTF8")));
-                                                    mc.dos.flush();
-
-                                                }
-                                            }
-
-
-
-                                            this.s.close();
-                                            break;
-                                    }
+                                if(received.equals("logout")){
+		                    this.isloggedin=false;
+                                    
+                                    
+                                    chat_window.i--;
+                                    chat_window.uname = this.name;
+                                    for (ClientHandler mc : chat_window.ar) 
+		                {
+		                    // if the recipient is found, write on its
+		                    // output stream
+		                    if (mc.isloggedin==true)
+		                    {
+                                        mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("\t"+"'"+this.name+"'" + " logeed out").getBytes("UTF8")));
+		                        mc.dos.flush();
+		                        
+		                    }
+		                }
+                                    
+                                    
+                                    
+		                    this.s.close();
+		                    break;
+		                }
 		               
-                                    else if(received.contains("#")){
-                                        StringTokenizer st = new StringTokenizer(received, " ");
-                                        String MsgToSend ="";
-                                        String recipient = "";
-                                        while (st.hasMoreTokens()){
+                                else if(received.contains("#")){
+                                    StringTokenizer st = new StringTokenizer(received, " ");
+                                    String MsgToSend = "";
+                                    String recipient = "";
+                                    while (st.hasMoreTokens()){
                                             String token = st.nextToken();
                                             System.out.println(token);
                                             if(token.indexOf('#')>=0){
-                                                System.out.println("******  ha aa gya # ********");
+                                               
                                                 StringBuilder msg = new StringBuilder (token);
                                                 msg.deleteCharAt(0);
-                                                MsgToSend+=msg.toString();
+                                                
+                                                recipient+=msg.toString();
                                             }
-//                                            else{
-                                                recipient+=token+" ";
-//                                            }
-                                        }
-
-                                            for (ClientHandler mc : chat_window.ar) 
-                                            {
-
-                                            if (mc.name.equals(MsgToSend) && mc.isloggedin==true) 
-                                                {
-                                                  mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("#"+MsgToSend+" : "+recipient).getBytes("UTF8")));
-                                                   mc.dos.flush();
-                                                        break;
+                                                else{
+                                                MsgToSend+=token+" ";
                                                 }
-                                            
+                                                }
+                                        
+                                                    
+                // search for the recipient in the connected devices list.
+                // ar is the vector storing client of active users
+                                        System.out.println(recipient);
+                                        for (ClientHandler mc : chat_window.ar) 
+                                        {
+                    // if the recipient is found, write on its
+                    // output stream
+                                        if ((mc.name.equals(recipient) || mc.name.equals(this.name)) && mc.isloggedin==true) 
+                                            {
+                                               
+                                              mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("@"+this.name+" : "+MsgToSend).getBytes("UTF8")));
+                                               mc.dos.flush();
+                                                    
                                             }
-
-                                    }
-                                    else{ // ar is the vector storing client of active users
-                                        for (ClientHandler mc : chat_window.ar){
-                                            // if the recipient is found, write on its
-                                            // output stream
-                                            if (mc.isloggedin==true){
-                                                mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), (this.name+" : "+received).getBytes("UTF8")));
-                                                mc.dos.flush();
-                                             }
                                         }
-                                    }
-                                    break;
+                                break;
+                                
+                                
+                                }
+                                else{
+		                // ar is the vector storing client of active users
+		                for (ClientHandler mc : chat_window.ar) 
+		                {
+		                    // if the recipient is found, write on its
+		                    // output stream
+		                    if (mc.isloggedin==true) 
+		                    {
+                                        mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), (this.name+" : "+received).getBytes("UTF8")));
+		                        mc.dos.flush();
+		                        
+		                    }
+		                }
+                                }
+                                break;
                                }
                                }
 		            } catch (IOException e) {

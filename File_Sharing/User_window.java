@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
-import static javax.swing.Spring.constant;
 
 /**
  *
@@ -47,13 +46,12 @@ public class User_window extends javax.swing.JFrame {
     String rcv = "";
     String user;
     RandomAccessFile rw;
-     long lengt;
-    String fn;
+     String fn;
     String file_recv="";
-    ProgressBarExample m;
-  
-    
-public User_window() {
+  long current_file_pointer_read = 0;
+  long current_file_pointer_write = 0;
+    long length;
+    public User_window() {
         initComponents();
     }
 public User_window(Socket socket ,String user) {
@@ -97,13 +95,14 @@ public void additem(){
 }
 
 
-        
+	    
 
 
 
 
 
-public void datatransferread(){                
+                 public void datatransferread(){
+                     
         try {
             dis = new DataInputStream(this.socket.getInputStream());
             dos = new DataOutputStream(this.socket.getOutputStream());
@@ -129,8 +128,7 @@ public void datatransferread(){
                 public void run() {
                     try{
                         
-                        long current_file_pointer_read = 0;
-                        long current_file_pointer_write = 0;
+                        
                        
                         while (true) {
                             if (dis.read() == 2) {
@@ -143,23 +141,18 @@ public void datatransferread(){
                                             r.setVisible(true);
                                             file_recv = new String(recv_buff);
                                             
-                                            StringTokenizer rc = new StringTokenizer(file_recv, "@");
+                                           StringTokenizer rc = new StringTokenizer(file_recv, "@");
                                             String file_name = rc.nextToken();
                                             file_recv = rc.nextToken();
-                                            lengt=Long.parseLong(rc.nextToken());
-                                            System.out.println("***** length 101 *******"+lengt);
+                                            length=Long.parseLong(rc.nextToken());
                                             r.msg.setText(file_name+"------->>>>"+file_recv);
-                                            m=new ProgressBarExample();    
-                                            m.setVisible(true); 
-                                               
                                             Thread q = new Thread(new Runnable(){
-                                            
                                                 
-                                            public void run(){
+                                                public void run(){
                                             while(true){
-                                                System.out.println(r.k+" reciver ");
-                                                if(r.k==1){
-                                                    System.out.println("** come int r. k *****"+r.k);
+                                                System.out.println(r.k);
+                                            if(r.k==1){
+                                                
                                                     try {
                                                         dos.write(CreateDataPacket("161".getBytes("UTF8"), file_recv.getBytes("UTF8")));
                                                         dos.flush();
@@ -172,10 +165,10 @@ public void datatransferread(){
                                                    
                                                     break;
                                                 
-                                                }
-                                                if (r.k==2){
-                                                    break;
-                                                }
+                                            }
+                                            if (r.k==2){
+                                                break;
+                                            }
                                             }
                                                 }
                                             });
@@ -190,23 +183,17 @@ public void datatransferread(){
                                         break;
                                     case 121:
                                         rw.seek(current_file_pointer_read);
-                                        
                                         rw.write(recv_buff);
                                         current_file_pointer_read = rw.getFilePointer();
-//                                            public static void main(String[] args) {    
-                                           
-                                        m.iterate(current_file_pointer_read*100/lengt);    
-
-                                        System.out.println("Download percentage: " + ((float)current_file_pointer_read/lengt)*100+"%");
-                                        System.out.println("******* in 121 ********"+lengt+" ----- "+(float)current_file_pointer_read);
+                                        progressionbar1.RenderProgress(((float)current_file_pointer_read/length)*100);
+                                        System.out.println("Download percentage: " + ((float)current_file_pointer_read/length)*100+"%");
                                         dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer_read).getBytes("UTF8")));
                                         dos.flush();
                                         break;
                                     case 131:
                                         if ("Close".equals(new String(recv_buff))) {
                                             rw.close();
-                                            current_file_pointer_read = 0;
-                                            
+                                            current_file_pointer_read=0;
                                         }
                                         break;
                                     case 141:
@@ -219,6 +206,10 @@ public void datatransferread(){
                                     case 151:
                                         current_file_pointer_write = Long.valueOf(new String(recv_buff));
                                         System.out.println(current_file_pointer_write);
+                                        
+                                        progressionbar1.RenderProgress(((float)current_file_pointer_write/length)*100);
+                                             
+                                               
                                         int buff_len = (int) (rw.length() - current_file_pointer_write < 20000 ? rw.length() - current_file_pointer_write : 20000);
                                         byte[] temp_buff = new byte[buff_len];
                                         if (current_file_pointer_write != rw.length()) {
@@ -226,23 +217,18 @@ public void datatransferread(){
                                             rw.read(temp_buff, 0, temp_buff.length);
                                             dos.write(CreateDataPacket("121".getBytes("UTF8"), temp_buff));
                                             dos.flush();
-                                            System.out.println("******* in 151 ********"+rw.length()+"  "+(float)current_file_pointer_write);
-                                                    
-                                                  
-                                            
-                                            System.out.println("Upload percentage: " + ((float)current_file_pointer_write/rw.length())*100+"%");
+                                            System.out.println("Upload percentage: " + ((float)current_file_pointer_write/length)*100+"%");
                                         } else {
                                             dos.write(CreateDataPacket("131".getBytes("UTF8"), "Close".getBytes("UTF8")));
                                             dos.flush();
+                                            current_file_pointer_write=0;
                                             
                                         }
                                         break;
                                     case 161:
                                         try {
-                                            
+                                                
                                             rw = new RandomAccessFile(file, "r");
-                                            lengt=rw.length();
-                                            System.out.println("********** file length int 161 ********* "+ lengt);
                                             dos.write(CreateDataPacket("111".getBytes("UTF8"), file.getName().getBytes("UTF8")));
                                             dos.flush();
                                             } catch (IOException ex) {
@@ -276,27 +262,27 @@ public void datatransferread(){
 
 
     private byte[] CreateDataPacket(byte[] cmd, byte[] data) {
-            byte[] packet = null;
-            try {
-                byte[] initialize = new byte[1];
-                initialize[0] = 2;
+	        byte[] packet = null;
+	        try {
+	            byte[] initialize = new byte[1];
+	            initialize[0] = 2;
                     
-                byte[] separator = new byte[1];
-                separator[0] = 4;
-                byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
-                packet = new byte[initialize.length + cmd.length + separator.length + data_length.length + data.length];
+	            byte[] separator = new byte[1];
+	            separator[0] = 4;
+	            byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
+	            packet = new byte[initialize.length + cmd.length + separator.length + data_length.length + data.length];
 
-                System.arraycopy(initialize, 0, packet, 0, initialize.length);
-                System.arraycopy(cmd, 0, packet, initialize.length, cmd.length);
-                System.arraycopy(data_length, 0, packet, initialize.length + cmd.length, data_length.length);
-                System.arraycopy(separator, 0, packet, initialize.length + cmd.length + data_length.length, separator.length);
-                System.arraycopy(data, 0, packet, initialize.length + cmd.length + data_length.length + separator.length, data.length);
+	            System.arraycopy(initialize, 0, packet, 0, initialize.length);
+	            System.arraycopy(cmd, 0, packet, initialize.length, cmd.length);
+	            System.arraycopy(data_length, 0, packet, initialize.length + cmd.length, data_length.length);
+	            System.arraycopy(separator, 0, packet, initialize.length + cmd.length + data_length.length, separator.length);
+	            System.arraycopy(data, 0, packet, initialize.length + cmd.length + data_length.length + separator.length, data.length);
 
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return packet;
-        }
+	        } catch (UnsupportedEncodingException ex) {
+	            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+	        }
+	        return packet;
+	    }
     private byte[] ReadStream(DataInputStream din) {
         byte[] data_buff = null;
         try {
@@ -343,16 +329,17 @@ public void datatransferread(){
         file_name_text = new javax.swing.JTextField();
         Send_file = new javax.swing.JButton();
         users = new javax.swing.JComboBox<>();
+        progressionbar1 = new file_sharing.Progressionbar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         chat_area.setColumns(20);
         chat_area.setRows(5);
         chat_area.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 chat_areaInputMethodTextChanged(evt);
-            }
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
         });
         chat_area.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
@@ -416,6 +403,12 @@ public void datatransferread(){
             }
         });
 
+        file_name_text.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                file_name_textActionPerformed(evt);
+            }
+        });
+
         Send_file.setText("Send");
         Send_file.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -435,24 +428,37 @@ public void datatransferread(){
             }
         });
 
+        javax.swing.GroupLayout progressionbar1Layout = new javax.swing.GroupLayout(progressionbar1);
+        progressionbar1.setLayout(progressionbar1Layout);
+        progressionbar1Layout.setHorizontalGroup(
+            progressionbar1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 236, Short.MAX_VALUE)
+        );
+        progressionbar1Layout.setVerticalGroup(
+            progressionbar1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 171, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(261, Short.MAX_VALUE)
-                        .addComponent(users, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(Send_file)
-                        .addGap(65, 65, 65)))
+                        .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(74, 74, 74)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(progressionbar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(users, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(Send_file)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(disconnect, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -467,44 +473,49 @@ public void datatransferread(){
                         .addGap(31, 31, 31)
                         .addComponent(watch_video)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(103, 103, 103)
-                .addComponent(file_name_text)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(file_name_text, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
                 .addComponent(browse)
-                .addGap(215, 215, 215))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(disconnect))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 130, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(file_name_text, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(browse))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(27, 27, 27)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(history)
-                            .addComponent(watch_video))
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chat_text, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(send, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addContainerGap())
+                            .addComponent(watch_video)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(disconnect)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(browse)
-                            .addComponent(file_name_text, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(Send_file)
-                            .addComponent(users, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(289, 289, 289))))
+                            .addComponent(users, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(Send_file))))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(progressionbar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chat_text, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(send, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
         );
 
         pack();
@@ -521,10 +532,10 @@ public void datatransferread(){
                 
                 try {
                     // write on the output stream
-                    if(msg!=null){
+                    if(!msg.equalsIgnoreCase("")){
                     
                    
-                    dos.write(CreateDataPacket("141".getBytes("UTF8"), msg.getBytes("UTF8")));
+                  dos.write(CreateDataPacket("141".getBytes("UTF8"), msg.getBytes("UTF8")));
                                       dos.flush();
                  
                     
@@ -611,6 +622,7 @@ public void datatransferread(){
     private void Send_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Send_fileActionPerformed
         try {
             // TODO add your handling code here:
+            length=file.length();
             String s= file.getName()+"@"+ users.getSelectedItem().toString()+"@"+file.length();
             dos.write(CreateDataPacket("101".getBytes("UTF8"), s.getBytes("UTF8")));
             dos.flush();
@@ -621,6 +633,10 @@ public void datatransferread(){
                 
         
     }//GEN-LAST:event_Send_fileActionPerformed
+
+    private void file_name_textActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_file_name_textActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_file_name_textActionPerformed
 
     /**
      * @param args the command line arguments
@@ -670,6 +686,7 @@ public void datatransferread(){
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu jPopupMenu2;
     private javax.swing.JScrollPane jScrollPane1;
+    private file_sharing.Progressionbar progressionbar1;
     private javax.swing.JButton send;
     private javax.swing.JTextField username;
     private javax.swing.JComboBox<String> users;
