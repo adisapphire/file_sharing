@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package file_sharing;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
+import java.io.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -20,18 +16,12 @@ import java.util.Calendar;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
+import java.util.logging.*;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
-
-
-/**
- *
- * @author rockstar
- */
 
 
 
@@ -56,21 +46,19 @@ public class User_window extends javax.swing.JFrame {
   long current_file_pointer_read = 0;
   long current_file_pointer_write = 0;
     long length;
+    Logger logger;
+    FileHandler fileHandler;
     public User_window() {
         initComponents();
     }
-public User_window(Socket socket ,String user) {
+    public User_window(Socket socket ,String user,Logger logger,FileHandler fileHandler) {
         initComponents();
-        
         this.socket=socket;
-         this.user = user;
-        
-        this.username.setText(user);
-       
-       
-       
+        this.user = user;
+        this.logger = logger;
+        this.fileHandler = fileHandler;
+        this.username.setText(user); 
     }
-
 
 
 public void print(){

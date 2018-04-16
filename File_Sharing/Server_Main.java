@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package file_sharing;
 
 import java.io.DataInputStream;
@@ -17,13 +13,6 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-/**
- *
- * @author rockstar
- */
-
-
 
 
 public class Server_Main extends javax.swing.JFrame {

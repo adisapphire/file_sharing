@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package file_sharing;
 
 import java.awt.BasicStroke;
@@ -17,10 +13,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Random;
 import javax.swing.JPanel;
 
-/**
- *
- * @author rockstar
- */
+
 public class Progressionbar extends JPanel {
 
     /**

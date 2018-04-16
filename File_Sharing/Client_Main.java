@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package file_sharing;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -19,6 +15,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.File;
+import java.util.logging.FileHandler;
 import javax.swing.JFileChooser;
 
 import javax.swing.JFileChooser;
@@ -26,14 +23,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 
-/**
- *
- * @author rockstar
- */
-
-
  class Client {
-	
+    
 
 }
 public class Client_Main extends javax.swing.JFrame {
@@ -41,10 +32,10 @@ public class Client_Main extends javax.swing.JFrame {
     public Socket socket            = null;
     private DataInputStream  input   = null;
     private DataOutputStream out     = null;
-	public void setupconnection(String ip,int port) {
+    public void setupconnection(String ip,int port) {
          
             
-	try
+    try
         {
             this.socket = new Socket(ip, port);
             System.out.println("Connection Established!");
@@ -58,9 +49,9 @@ public class Client_Main extends javax.swing.JFrame {
         {
             System.out.println(i);
         }
-	}
-	
-	
+    }
+    
+    
     /**
      * Creates new form Client_Main
      */
@@ -102,7 +93,11 @@ public class Client_Main extends javax.swing.JFrame {
         connect.setText("Connect");
         connect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                connectActionPerformed(evt);
+                try {
+                    connectActionPerformed(evt);
+                } catch (IOException ex) {
+                    Logger.getLogger(Client_Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 
@@ -163,7 +158,7 @@ public class Client_Main extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void connectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectActionPerformed
+    private void connectActionPerformed(java.awt.event.ActionEvent evt) throws IOException {//GEN-FIRST:event_connectActionPerformed
         // TODO add your handling code here:
         
             ip = this.ipaddress.getText();
@@ -171,12 +166,12 @@ public class Client_Main extends javax.swing.JFrame {
             user = this.username.getText();
             this.setupconnection(ip, pn);
             Logger logger = Logger.getLogger("mylog");   
-            FileHandler fileHandler = new FileHandler("E:\\file_sharing\\File_Sharing\\Filapplogg.log", true); 
+            FileHandler fileHandler = new FileHandler("E:\\file_sharing\\File_Sharing\\File.log", true); 
             
             if(this.socket!=null && user!=null){
                 
                     this.hide();
-                    User_window uw = new User_window(this.socket,user);
+                    User_window uw = new User_window(this.socket,user,logger,fileHandler);
                     uw.setVisible(true);
                     Thread t1 = new Thread( new Runnable(){
                         @Override
