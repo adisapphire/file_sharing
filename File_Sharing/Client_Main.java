@@ -1,5 +1,5 @@
-
 package file_sharing;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -20,27 +20,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import javax.swing.JFileChooser;
-
-
-/**
- *
- * @author rockstar
- */
-
-
- class Client {
-	
-
+class Client{
+    
 }
+
 public class Client_Main extends javax.swing.JFrame {
 
-    public Socket socket            = null;
-    private DataInputStream  input   = null;
+    public Socket socket             = null;
+    private DataInputStream input   = null;
     private DataOutputStream out     = null;
-	public void setupconnection(String ip,int port) {
-         
-            
-	try
+    public void setupconnection(String ip,int port){ 
+    try
         {
             this.socket = new Socket(ip, port);
             System.out.println("Connection Established!");
@@ -54,24 +44,16 @@ public class Client_Main extends javax.swing.JFrame {
         {
             System.out.println(i);
         }
-	}
-	
-	
-	
-	
-	 
-	
+    }
+        
     /**
      * Creates new form Client_Main
      */
     public Client_Main() {
         initComponents();
     }
-
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         ipaddress = new javax.swing.JTextField();
         port_no = new javax.swing.JTextField();
         connect = new javax.swing.JButton();
@@ -160,18 +142,16 @@ public class Client_Main extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    private void connectActionPerformed(java.awt.event.ActionEvent evt) throws IOException {//GEN-FIRST:event_connectActionPerformed
-        // TODO add your handling code here:
-        
+    private void connectActionPerformed(java.awt.event.ActionEvent evt) throws IOException {        
             ip = this.ipaddress.getText();
             pn =  Integer.parseInt(this.port_no.getText());
             user = this.username.getText();
             this.setupconnection(ip, pn);
             Logger logger = Logger.getLogger("mylog");
 
-            FileHandler fileHandler = new FileHandler("E:\\file_sharing\\File_Sharing\\File_appd.log", true); 
+            FileHandler fileHandler = new FileHandler("E:\\file_sharing\\File_Sharing\\Filapplogg.log", true); 
             
             if(this.socket!=null && user!=null){
                 
@@ -189,23 +169,20 @@ public class Client_Main extends javax.swing.JFrame {
             }
             
             
-    }//GEN-LAST:event_connectActionPerformed
+    }
 
     private void port_noActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_port_noActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_port_noActionPerformed
-
+    }
     private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_usernameActionPerformed
+    }
 
     private void ipaddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ipaddressActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_ipaddressActionPerformed
+    }
 
-  
     public static void main(String args[]) {
-
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -232,7 +209,6 @@ public class Client_Main extends javax.swing.JFrame {
 private String ip;
     private int pn;
     private String user;
-
     private javax.swing.JButton connect;
     private javax.swing.JTextField ipaddress;
     private javax.swing.JLabel jLabel1;
@@ -240,5 +216,4 @@ private String ip;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField port_no;
     private javax.swing.JTextField username;
-    // End of variables declaration//GEN-END:variables
 }
