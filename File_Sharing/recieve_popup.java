@@ -20,11 +20,12 @@ import javax.swing.filechooser.FileSystemView;
 public class recieve_popup extends javax.swing.JFrame {
 
     /**
-     * Creates new form recieve_popup
+     * Creates new form recieve popup
      */
     public recieve_popup() {
         initComponents();
         JFrame frame =this;
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter(){
                public void windowClosing(WindowEvent evt) {
             int Answer = JOptionPane.showConfirmDialog(frame,"You want to quit?", "Quit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -34,7 +35,8 @@ public class recieve_popup extends javax.swing.JFrame {
                        
                 }
         }
-        });
+        }
+        );
    
     }
 public void cloose(){

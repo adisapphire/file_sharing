@@ -216,7 +216,7 @@ class ClientHandler implements Runnable
 		                    // output stream
 		                    if (mc.isloggedin==true)
 		                    {
-                                        mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("\t"+"'"+this.name+"'" + " logeed out").getBytes("UTF8")));
+                                        mc.dos.write(CreateDataPacket("141".getBytes("UTF8"), ("\t"+"'"+this.name+"'" + " loged out").getBytes("UTF8")));
 		                        mc.dos.flush();
 		                        
 		                    }
