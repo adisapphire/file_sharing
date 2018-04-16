@@ -281,12 +281,12 @@ public class hi extends javax.swing.JFrame {
                     Object obj12 [][] = new Object[1000][5];
                             for(int i=record.size()-1;i>=0;i--){
                                 System.out.println("--->"+record.get(i));
-                                obj12[i][0] = record.get(i).filename;
+                                obj12[record.size()-1-i][0] = record.get(i).filename;
                                     String g [] = record.get(i).Date_Time.split(" ");
-                                    obj12[i][1] = g[0];
-                                    obj12[i][2] = g[1];
-                                    obj12[i][3] = record.get(i).Status;
-                                    obj12[i][4] = record.get(i).User;
+                                    obj12[record.size()-1-i][1] = g[0];
+                                    obj12[record.size()-1-i][2] = g[1];
+                                    obj12[record.size()-1-i][3] = record.get(i).Status;
+                                    obj12[record.size()-1-i][4] = record.get(i).User;
 //                                    System.out.println(obj1[i][0]+" --  >"+obj1[i][1]+" --  >"+obj1[i][2]+" --  >"+obj1[i][3]+" --  >"+obj1[i][4]+" --  >");
                             }
                             History_table.setModel(new javax.swing.table.DefaultTableModel(
@@ -315,7 +315,7 @@ public class hi extends javax.swing.JFrame {
                            "File", "Date", "Time","Action","from"
                         }
                     )); 
-                            check=0;
+                    check=0;
                 }
             }
         });

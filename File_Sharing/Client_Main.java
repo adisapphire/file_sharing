@@ -170,6 +170,8 @@ public class Client_Main extends javax.swing.JFrame {
             pn =  Integer.parseInt(this.port_no.getText());
             user = this.username.getText();
             this.setupconnection(ip, pn);
+            Logger logger = Logger.getLogger("mylog");   
+            FileHandler fileHandler = new FileHandler("E:\\file_sharing\\File_Sharing\\Filapplogg.log", true); 
             
             if(this.socket!=null && user!=null){
                 
@@ -183,18 +185,18 @@ public class Client_Main extends javax.swing.JFrame {
                             uw.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                             uw.addWindowListener(new WindowAdapter() {
                   
-              public void windowClosing(WindowEvent evt) {
-        int Answer = JOptionPane.showConfirmDialog(uw, "You want to quit?", "Quit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (Answer == JOptionPane.YES_OPTION) {
-                                uw.logout();
-                                uw.dispose();
-                                
+                    public void windowClosing(WindowEvent evt) {
+                        int Answer = JOptionPane.showConfirmDialog(uw, "You want to quit?", "Quit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (Answer == JOptionPane.YES_OPTION) {
+                            uw.logout();
+                            uw.dispose();
+                            
                         }
-                   
-    }
-});
+
                         }
-              });
+                    });
+                   }
+                  });
               t1.start();
                     
             }

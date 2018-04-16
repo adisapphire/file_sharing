@@ -5,8 +5,6 @@
  */
 package file_sharing;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -17,14 +15,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 
 
 /**
@@ -166,6 +167,19 @@ public void removeitem(){
                                             file_recv = rc.nextToken();
                                             length=Long.parseLong(rc.nextToken());
                                             r.msg.setText(file_name+"------->>>>"+file_recv);
+                                            logger.addHandler(fileHandler);
+                                            SimpleFormatter formatter = new SimpleFormatter();
+                                            fileHandler.setFormatter(formatter);
+                                            Calendar cal = Calendar.getInstance();
+                                            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                            String strDate = sdf.format(cal.getTime());
+                                            System.out.println("Current date in String Format: " + strDate);
+
+                                            if (logger.isLoggable(Level.INFO)) {
+                                                logger.info(" "+file_name+"  "+strDate+" am  "+"recieve"+"  "+file_recv);
+                                                System.out.println("sender **************   actiuon");
+                                            }
+
                                             Thread q = new Thread(new Runnable(){
                                                 
                                                 public void run(){
@@ -641,11 +655,24 @@ public void removeitem(){
     }//GEN-LAST:event_browseActionPerformed
 
     private void Send_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Send_fileActionPerformed
-        try {
-            // TODO add your handling code here:
+                try {
+
             length=file.length();
             String s= file.getName()+"@"+ users.getSelectedItem().toString()+"@"+file.length();
+            logger.addHandler(fileHandler);
+            SimpleFormatter formatter = new SimpleFormatter();
+            fileHandler.setFormatter(formatter);
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            String strDate = sdf.format(cal.getTime());
+            System.out.println("Current date in String Format: " + strDate);
+            
+            if (logger.isLoggable(Level.INFO)) {
+                logger.info(" "+file.getName()+"  "+strDate+" pm  send  "+this.user);
+            }
+
             dos.write(CreateDataPacket("101".getBytes("UTF8"), s.getBytes("UTF8")));
+            
             dos.flush();
         } catch (IOException ex) {
             Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);

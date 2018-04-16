@@ -40,7 +40,7 @@ class Crypto {
 	
      public static void main(String[] args) {
 	String key = "Computer Network Project";
-	File inputFile = new File("text.txt");
+	File inputFile = new File("test.txt");
 	File encryptedFile = new File("text.encrypted");		
 	try {
 	     Crypto.fileProcessor(Cipher.ENCRYPT_MODE,key,inputFile,encryptedFile);
