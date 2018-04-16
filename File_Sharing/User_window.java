@@ -1,11 +1,8 @@
-<<<<<<< HEAD
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-=======
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
 package file_sharing;
 
 import java.awt.event.WindowAdapter;
@@ -30,7 +27,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 
-<<<<<<< HEAD
 /**
  *
  * @author rockstar
@@ -47,9 +43,6 @@ public class User_window extends javax.swing.JFrame {
     /**
      * Creates new form User_window
      */
-=======
-public class User_window extends javax.swing.JFrame {
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
     public Socket socket            = null;
     DataInputStream dis = null;
     DataOutputStream dos = null;
@@ -57,7 +50,6 @@ public class User_window extends javax.swing.JFrame {
     String rcv = "";
     String user;
     RandomAccessFile rw;
-<<<<<<< HEAD
      String fn;
     String file_recv="";
   long current_file_pointer_read = 0;
@@ -272,215 +264,8 @@ public void removeitem(){
                         }
                     }
                     catch(IOException e){}
-=======
-    String fn;
-    String file_recv="";
-    long current_file_pointer_read = 0;
-    long current_file_pointer_write = 0;
-    long length;
-    Logger logger;
-    FileHandler fileHandler;
-    public User_window() {
-        initComponents();
-    }
-    public User_window(Socket socket ,String user,Logger logger,FileHandler fileHandler) {
-        initComponents();
-        this.socket=socket;
-        this.user = user;
-        this.logger = logger;
-        this.fileHandler = fileHandler;
-        this.username.setText(user); 
-    }
-    public void print(){
-         this.chat_area.append(rcv+"\n");
-    }
-    public void logout(){
-        Thread sendMessage = new Thread(new Runnable(){
-            @Override
-            public void run() {
-                try {
-                   
-                    dos.write(CreateDataPacket("141".getBytes("UTF8"), "logout".getBytes("UTF8")));
-                    dos.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-            }}});
-        sendMessage.start();
-    }
-    public void additem(){
-                Pattern pattern = Pattern.compile("'(.*?)'");
-                Matcher matcher = pattern.matcher(rcv);
-                
-                if (matcher.find() && !matcher.group(1).equalsIgnoreCase(this.username.getText()))
-                    {
-                        this.users.addItem(matcher.group(1));
-        
-                    }
-            
-    }
-
-
-        public void datatransferread(){
-                try {
-                    dis = new DataInputStream(this.socket.getInputStream());
-                    dos = new DataOutputStream(this.socket.getOutputStream());
-                    Thread t = new Thread(new Runnable(){
-                        public void run(){
-                            try {                       
-                                String name = user;
-                                dos.writeUTF(name);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    t.start();
-                    Thread readMessage = new Thread(new Runnable()
-                    {
-                        
-                        @Override
-                        
-                        public void run() {
-                            try{
-                                
-                                
-                               
-                                while (true) {
-                                    if (dis.read() == 2) {
-                                        byte[] cmd_buff = new byte[3];
-                                        dis.read(cmd_buff, 0, cmd_buff.length);
-                                        byte[] recv_buff = ReadStream(dis);
-                                        switch (Integer.parseInt(new String(cmd_buff))){
-                                            case 101:
-                                                    recieve_popup r = new recieve_popup();
-                                                    r.setVisible(true);
-                                                    file_recv = new String(recv_buff);
-                                                    StringTokenizer rc = new StringTokenizer(file_recv, "@");
-                                                    String file_name = rc.nextToken();
-                                                    file_recv = rc.nextToken();
-                                                    length=Long.parseLong(rc.nextToken());
-                                                    
-                                                    r.msg.setText(file_name+"------->>>>"+file_recv);
-                                                    logger.addHandler(fileHandler);
-                                                    SimpleFormatter formatter = new SimpleFormatter();
-                                                    fileHandler.setFormatter(formatter);
-                                                    Calendar cal = Calendar.getInstance();
-                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                                                    String strDate = sdf.format(cal.getTime());
-                                                    System.out.println("Current date in String Format: " + strDate);
-
-                                                    if (logger.isLoggable(Level.INFO)) {
-                                                        logger.info(" "+file_name+"  "+strDate+" am  "+"recieve"+"  "+file_recv);
-                                                        System.out.println("sender **************   actiuon");
-                                                    }
-                                                    Thread q = new Thread(new Runnable(){
-                                                    
-                                                        public void run(){
-                                                    while(true){
-        //                                                System.out.println(r.k);
-                                                    if(r.k==1){
-                                                        
-                                                            try {
-                                                                dos.write(CreateDataPacket("161".getBytes("UTF8"), file_recv.getBytes("UTF8")));
-                                                                dos.flush();
-                                                            } catch (IOException ex) {
-                                                                Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
-                                                            }
-                                                           fn= r.folder.toString();
-                                                           if(fn.charAt(fn.length()-1)!='\\')
-                                                               fn=fn+"\\";
-                                                           
-                                                            break;
-                                                        
-                                                    }
-                                                    if (r.k==2){
-                                                        break;
-                                                    }
-                                                    }
-                                                        }
-                                                    });
-                                                    q.start();
-                                                break;
-                                            case 111:
-                                                
-                                                rw = new RandomAccessFile(fn + new String(recv_buff), "rw");
-                                                dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer_read).getBytes("UTF8")));
-                                                
-                                                dos.flush();
-                                                break;
-                                            case 121:
-                                                rw.seek(current_file_pointer_read);
-                                                rw.write(recv_buff);
-                                                current_file_pointer_read = rw.getFilePointer();
-                                                progressionbar1.RenderProgress(((float)current_file_pointer_read/length)*100);
-                                                System.out.println("Download percentage: " + ((float)current_file_pointer_read/length)*100+"%");
-                                                dos.write(CreateDataPacket("151".getBytes("UTF8"), String.valueOf(current_file_pointer_read).getBytes("UTF8")));
-                                                dos.flush();
-                                                break;
-                                            case 131:
-                                                if ("Close".equals(new String(recv_buff))) {
-                                                    rw.close();
-                                                    current_file_pointer_read=0;
-                                                }
-                                                break;
-                                            case 141:
-                                                rcv= new String(recv_buff);
-                                                if(rcv.contains("Joined")){
-                                                    additem();
-                                                }
-                                                print();
-                                                break;
-                                            case 151:
-                                                current_file_pointer_write = Long.valueOf(new String(recv_buff));
-                                                System.out.println(current_file_pointer_write);
-                                                
-                                                progressionbar1.RenderProgress(((float)current_file_pointer_write/length)*100);
-                                                     
-                                                       
-                                                int buff_len = (int) (rw.length() - current_file_pointer_write < 20000 ? rw.length() - current_file_pointer_write : 20000);
-                                                byte[] temp_buff = new byte[buff_len];
-                                                if (current_file_pointer_write != rw.length()) {
-                                                    rw.seek(current_file_pointer_write);
-                                                    rw.read(temp_buff, 0, temp_buff.length);
-                                                    dos.write(CreateDataPacket("121".getBytes("UTF8"), temp_buff));
-                                                    dos.flush();
-                                                    System.out.println("Upload percentage: " + ((float)current_file_pointer_write/length)*100+"%");
-                                                } else {
-                                                    dos.write(CreateDataPacket("131".getBytes("UTF8"), "Close".getBytes("UTF8")));
-                                                    dos.flush();
-                                                    current_file_pointer_write=0;
-                                                    
-                                                }
-                                                break;
-                                            case 161:
-                                                try {
-                                                        
-                                                    rw = new RandomAccessFile(file, "r");
-                                                    dos.write(CreateDataPacket("111".getBytes("UTF8"), file.getName().getBytes("UTF8")));
-                                                    dos.flush();
-                                                    } catch (IOException ex) {
-                                                    Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
-                                                    }
-                                                break;
-                                                
-                                        }
-                                    }
-                                    
-                                }
-                            }
-                            catch(IOException e){}
-                            
-                        }
-                        
-                        
-                    });
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
                     
-                    readMessage.start();
-                } catch (IOException ex) {
-                    Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
                 }
-<<<<<<< HEAD
                 
                 
             });
@@ -494,13 +279,6 @@ public void removeitem(){
                  }
 
                
-=======
-                             
-                             
-    }
-
-                       
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
 
 
 
@@ -549,7 +327,6 @@ public void removeitem(){
         return data_buff;
     }
     
-<<<<<<< HEAD
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -557,9 +334,6 @@ public void removeitem(){
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-=======
-    @SuppressWarnings("unchecked")
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
     private void initComponents() {
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
@@ -584,19 +358,11 @@ public void removeitem(){
         chat_area.setColumns(20);
         chat_area.setRows(5);
         chat_area.addInputMethodListener(new java.awt.event.InputMethodListener() {
-<<<<<<< HEAD
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 chat_areaInputMethodTextChanged(evt);
             }
             public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
-=======
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
-            }
-            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
-                chat_areaInputMethodTextChanged(evt);
-            }
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
         });
         chat_area.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
@@ -692,11 +458,7 @@ public void removeitem(){
         );
         progressionbar1Layout.setVerticalGroup(
             progressionbar1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-<<<<<<< HEAD
             .addGap(0, 176, Short.MAX_VALUE)
-=======
-            .addGap(0, 171, Short.MAX_VALUE)
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -711,7 +473,6 @@ public void removeitem(){
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-<<<<<<< HEAD
                         .addGap(197, 197, 197)
                         .addComponent(users, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(28, 28, 28)
@@ -719,15 +480,6 @@ public void removeitem(){
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(74, 74, 74)
                         .addComponent(progressionbar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-=======
-                        .addGap(74, 74, 74)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(progressionbar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(users, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(28, 28, 28)
-                                .addComponent(Send_file)))))
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -776,20 +528,11 @@ public void removeitem(){
                             .addComponent(Send_file))))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-<<<<<<< HEAD
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(progressionbar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-=======
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(progressionbar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(22, 22, 22)))
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chat_text, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(send, javax.swing.GroupLayout.Alignment.TRAILING))
@@ -797,7 +540,6 @@ public void removeitem(){
         );
 
         pack();
-<<<<<<< HEAD
     }// </editor-fold>//GEN-END:initComponents
 
     private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
@@ -811,25 +553,14 @@ public void removeitem(){
                 
                 try {
                     // write on the output stream
-=======
-    }
-    private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
-        msg=this.chat_text.getText();
-        chat_text.setText("");
-                try {
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
                     if(!msg.equalsIgnoreCase("")){
                     
                    
                   dos.write(CreateDataPacket("141".getBytes("UTF8"), msg.getBytes("UTF8")));
-<<<<<<< HEAD
                                       dos.flush();
                  
                     
                   
-=======
-                      dos.flush();
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
                    
                     }
                 } catch (IOException e) {
@@ -840,7 +571,6 @@ public void removeitem(){
             
         
 
-<<<<<<< HEAD
     }//GEN-LAST:event_sendActionPerformed
 
     private void chat_textActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chat_textActionPerformed
@@ -900,49 +630,6 @@ public void removeitem(){
 
     private void browseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseActionPerformed
         // TODO add your handling code here:
-=======
-    }
-    private void chat_textActionPerformed(java.awt.event.ActionEvent evt) {
-
-    }
-    private void disconnectActionPerformed(java.awt.event.ActionEvent evt) {
-        this.logout();
-        System.exit(0);
-    }
-    private void watch_videoActionPerformed(java.awt.event.ActionEvent evt) {
-
-    }
-
-    private void historyActionPerformed(java.awt.event.ActionEvent evt) {
-        hi h = new hi();
-        h.setVisible(true);
-    }
-    private void usernameActionPerformed(java.awt.event.ActionEvent evt) {        
-        
-    }
-
-    private void chat_areaPropertyChange(java.beans.PropertyChangeEvent evt) {
-      this.chat_area.setEditable(false);
-    }
-
-    private void chat_areaInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
-        
-    }
-    private void usernamePropertyChange(java.beans.PropertyChangeEvent evt) {
-        this.username.setEditable(false);
-        
-    }
-
-    private void usersActionPerformed(java.awt.event.ActionEvent evt) {
-
-    }
-
-    private void usersItemStateChanged(java.awt.event.ItemEvent evt) {
-
-    }
-
-    private void browseActionPerformed(java.awt.event.ActionEvent evt) {
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
          JFileChooser jf = new JFileChooser();
                     int aa  = jf.showOpenDialog(null);
                     System.out.println(aa);
@@ -951,7 +638,6 @@ public void removeitem(){
                         file = jf.getSelectedFile();
                         file_name_text.setText(file.getAbsolutePath());
                     }
-<<<<<<< HEAD
     }//GEN-LAST:event_browseActionPerformed
 
     private void Send_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Send_fileActionPerformed
@@ -960,29 +646,6 @@ public void removeitem(){
             length=file.length();
             String s= file.getName()+"@"+ users.getSelectedItem().toString()+"@"+file.length();
             dos.write(CreateDataPacket("101".getBytes("UTF8"), s.getBytes("UTF8")));
-=======
-    }
-
-    private void Send_fileActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-
-            length=file.length();
-            String s= file.getName()+"@"+ users.getSelectedItem().toString()+"@"+file.length();
-            logger.addHandler(fileHandler);
-            SimpleFormatter formatter = new SimpleFormatter();
-            fileHandler.setFormatter(formatter);
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            String strDate = sdf.format(cal.getTime());
-            System.out.println("Current date in String Format: " + strDate);
-            
-            if (logger.isLoggable(Level.INFO)) {
-                logger.info(" "+file.getName()+"  "+strDate+" pm  send  "+this.user);
-            }
-
-            dos.write(CreateDataPacket("101".getBytes("UTF8"), s.getBytes("UTF8")));
-            
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
             dos.flush();
         } catch (IOException ex) {
             Logger.getLogger(User_window.class.getName()).log(Level.SEVERE, null, ex);
@@ -994,7 +657,6 @@ public void removeitem(){
 
     private void file_name_textActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_file_name_textActionPerformed
         // TODO add your handling code here:
-<<<<<<< HEAD
     }//GEN-LAST:event_file_name_textActionPerformed
 
     /**
@@ -1006,11 +668,6 @@ public void removeitem(){
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-=======
-    }
-    public static void main(String args[]) {
-
->>>>>>> 0f9d468f3e4b42a1a7e306420f7e5335f9eee4ea
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
