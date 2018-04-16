@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package file_sharing;
 
 import java.awt.BasicStroke;
@@ -17,22 +12,13 @@ import java.awt.geom.Rectangle2D;
 import java.util.Random;
 import javax.swing.JPanel;
 
-/**
- *
- * @author rockstar
- */
 public class Progressionbar extends JPanel {
-
-    /**
-     * @param args the command line arguments
-     */
     
     float progress = 0;
     
     @Override protected void paintComponent (Graphics g) {
             AffineTransform at = new AffineTransform();
             super.paintComponent(g);
-            
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             AffineTransform save_ctx = g2.getTransform();
