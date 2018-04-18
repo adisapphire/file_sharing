@@ -10,4 +10,4 @@ It consist of
 - [x] 6. GUI
 - [x] 7. Encryption of file data
 - [x] 8. Multiple sharing of file
-- [ ] 9. Sum up all and build it as one
+- [x] 9. Sum up all and build it as one
