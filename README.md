@@ -35,5 +35,4 @@ Project on File Sharing:-
 
 [<img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" width="20" padding="10">](https://github.com/lalkanhaiya) Kanhaiya Lal
 
-[<img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" width="20" padding="10">]
-Zahid Qureshi
+<img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" width="20" padding="10"> Zahid Qureshi
