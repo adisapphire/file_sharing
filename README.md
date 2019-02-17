@@ -11,6 +11,10 @@ Project on File Sharing:-
 -   Sum up all and build it as one
 
 ## How to Run
+**It would be better if install <a href="https://netbeans.org/">Netbeans</a>**
+
+- Add path of File.log <a href="https://github.com/rockstar777/file_sharing/blob/8754661f547f8d5c4462213c6021762683f7646d/File_Sharing/Client_Main.java#L169">here</a>
+
 -   First run Server_Main.java file you will see this window
 
     ![alt text](servermain.PNG)
