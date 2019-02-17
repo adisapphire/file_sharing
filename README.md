@@ -1,8 +1,8 @@
 Project on File Sharing:-
 
-[![ForTheBadge made-with-lava](https://forthebadge.com/images/badges/made-with-java.svg)]
-[![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)]
-[![opensource](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)]
+![ForTheBadge made-with-lava](https://forthebadge.com/images/badges/made-with-java.svg)
+![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)
+![opensource](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)
 ![license](https://img.shields.io/apm/l/vim-mode.svg?style=popout)
 [![Join the chat at https://gitter.im/File_shared/Lobby#](https://badges.gitter.im/file_sharing/file_sharing.svg)](https://gitter.im/File_shared/Lobby#?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
